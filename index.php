@@ -154,9 +154,7 @@ $items = [
                         <div class="lot__rate">
                             <span class="lot__amount">Стартовая цена</span>
                             <!--Вставка функции format_cost -->
-                            <?php $cost = $value["price"];
-                            $cost = format_cost($cost); ?>
-                            <span class="lot__cost"><?= $cost; ?></span>
+                            <span class="lot__cost"><?= format_cost($value["price"]); ?></span>
                         </div>
                         <div class="lot__timer timer">
                             12:23
