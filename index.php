@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+require_once 'function.php';
 $is_auth = rand(0, 1);
 
 $user_name = 'Николай'; // укажите здесь ваше имя
@@ -80,7 +82,7 @@ $categories = [
         "name" => "Разное",
         "css_class" => "promo__item--other",
     ],
-    ];
+];
 $items = [
     [
         "name" => "2014 Rossignol District Snowboard",
@@ -118,7 +120,7 @@ $items = [
         "price" => 5400,
         "url" => "img/lot-6.jpg"
     ]
-    ];
+];
 ?>
 
 <main class="container">
@@ -151,7 +153,8 @@ $items = [
                     <div class="lot__state">
                         <div class="lot__rate">
                             <span class="lot__amount">Стартовая цена</span>
-                            <span class="lot__cost"><?= $value["price"]; ?><b class="rub">р</b></span>
+                            <!--Вставка функции format_cost -->
+                            <span class="lot__cost"><?= format_cost($value["price"]); ?></span>
                         </div>
                         <div class="lot__timer timer">
                             12:23
