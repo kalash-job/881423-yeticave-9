@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once 'function.php';
+require_once 'init.php';
 require_once 'data.php';
 $is_auth = rand(0, 1);
 
