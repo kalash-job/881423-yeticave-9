@@ -32,8 +32,7 @@
                             <!--Вставка функции format_cost -->
                             <span class="lot__cost"><?= format_cost($value["price"]); ?></span>
                         </div>
-                        <div class="lot__timer timer">
-                            12:23
+                        <div class="lot__timer timer<?= time_to_midnight() ?>
                         </div>
                     </div>
                 </div>
