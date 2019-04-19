@@ -6,7 +6,8 @@
         <!--заполните этот список из массива категорий-->
         <?php foreach ($categories as $categories_option): ?>
             <li class="promo__item <?= htmlspecialchars($categories_option["css_class"]); ?>">
-                <a class="promo__link" href="pages/all-lots.html"><?= htmlspecialchars($categories_option["name"]); ?></a>
+                <a class="promo__link"
+                   href="pages/all-lots.html"><?= htmlspecialchars($categories_option["name"]); ?></a>
             </li>
         <?php endforeach ?>
     </ul>
@@ -24,7 +25,8 @@
                 </div>
                 <div class="lot__info">
                     <span class="lot__category"><?= htmlspecialchars($value["category"]); ?></span>
-                    <h3 class="lot__title"><a class="text-link" href="pages/lot.html"><?= htmlspecialchars($value["name"]); ?></a>
+                    <h3 class="lot__title"><a class="text-link"
+                                              href="pages/lot.html"><?= htmlspecialchars($value["name"]); ?></a>
                     </h3>
                     <div class="lot__state">
                         <div class="lot__rate">
@@ -32,7 +34,8 @@
                             <!--Вставка функции format_cost -->
                             <span class="lot__cost"><?= format_cost($value["price"]); ?></span>
                         </div>
-                        <div class="lot__timer timer<?= time_to_midnight() ?>
+                        <div class="lot__timer timer<?= color_hour_to_midnight(second_to_midnight(strtotime('tomorrow midnight'))); ?>">
+                            <?= time_to_midnight(second_to_midnight(strtotime('tomorrow midnight'))); ?>
                         </div>
                     </div>
                 </div>

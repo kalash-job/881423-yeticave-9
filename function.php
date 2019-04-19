@@ -13,15 +13,33 @@ function format_cost(float $cost): string
     return $result . " <b class=\"rub\">р</b>";
 }
 
-function time_to_midnight()
+function time_to_midnight($timestamp_to_midnight)
+{
+    $minut;
+    $hour;
+    $minut = intdiv($timestamp_to_midnight, 60) % 60;
+    if ($minut < 10) {
+        $minut = "0" . (string)$minut;
+    }
+    $hour = intdiv($timestamp_to_midnight, 3600) % 24;
+    if ($hour < 10) {
+        $hour = "0" . (string)$hour;
+    }
+    return($hour . ":" . $minut);
+}
+
+function second_to_midnight($timestamp_of_end)
+{
+    $timestamp_to_midnight;
+    $timestamp_to_midnight = $timestamp_of_end - strtotime("now");
+    return($timestamp_to_midnight);
+}
+
+function color_hour_to_midnight($timestamp_to_midnight)
 {
     $result = "";
-    $timestamp_to_midnight;
-    $timestamp_to_midnight = strtotime("tomorrow midnight") - strtotime("now");
-    if ($timestamp_to_midnight > 3600) {
-        $result .= "\"> " . date("H:i", (int) ($timestamp_to_midnight - 3 * 3600));
-    } else {
-        $result .= " timer--finishing\"> " . date("H:i", (int) ($timestamp_to_midnight - 3 * 3600));
+    if ($timestamp_to_midnight <= 3600) {
+        $result .= " timer--finishing";
     }
     return($result);
 }
