@@ -34,8 +34,8 @@
                             <!--Вставка функции format_cost -->
                             <span class="lot__cost"><?= format_cost($value["price"]); ?></span>
                         </div>
-                        <div class="lot__timer timer<?= color_hour_to_midnight(second_to_midnight(strtotime('tomorrow midnight'))); ?>">
-                            <?= time_to_midnight(second_to_midnight(strtotime('tomorrow midnight'))); ?>
+                        <div class="lot__timer timer<?= color_hour_to_closing_date(second_to_closing_date(strtotime('tomorrow midnight'))); ?>">
+                            <?= time_to_closing_date(second_to_closing_date(strtotime('tomorrow midnight'))); ?>
                         </div>
                     </div>
                 </div>
