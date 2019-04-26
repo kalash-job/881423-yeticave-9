@@ -52,7 +52,7 @@ FROM category;
 SELECT l.name,
        l.price,
        l.url,
-       c.name   AS category_name,
+       c.name                                                                          AS category_name,
        l.id,
        l.creation_date,
        MAX(GREATEST(COALESCE(l.price, b.bid_amount), COALESCE(b.bid_amount, l.price))) AS current_price
