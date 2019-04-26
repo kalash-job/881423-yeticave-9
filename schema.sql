@@ -15,9 +15,9 @@ CREATE TABLE user
 
 CREATE TABLE category
 (
-    id            INT AUTO_INCREMENT PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL UNIQUE,
-    simbolic_code VARCHAR(500) UNIQUE
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    name      VARCHAR(255) NOT NULL UNIQUE,
+    css_class VARCHAR(500) UNIQUE
 );
 
 CREATE TABLE lot
@@ -26,8 +26,8 @@ CREATE TABLE lot
     creation_date   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     name            VARCHAR(255)  NOT NULL,
     description     VARCHAR(2000) NOT NULL,
-    img_path        VARCHAR(500),
-    starting_price  INT           NOT NULL,
+    url             VARCHAR(500),
+    price           INT           NOT NULL,
     completion_date TIMESTAMP,
     bid_step        INT           NOT NULL,
     category_id     INT           NOT NULL,
