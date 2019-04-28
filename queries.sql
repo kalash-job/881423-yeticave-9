@@ -64,7 +64,7 @@ FROM lot l
 WHERE l.completion_date > now()
 GROUP BY l.id, l.name, l.url, l.price, l.creation_date, c.name
 ORDER BY l.creation_date DESC
-LIMIT 6;
+LIMIT 9;
 
 
 /*показать лот по его id. Получите также название категории, к которой принадлежит лот*/
@@ -85,3 +85,5 @@ FROM bid
 WHERE lot_id = 1
 ORDER BY date DESC
 LIMIT 3;
+
+

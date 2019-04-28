@@ -1,4 +1,6 @@
 <?php
+
+/*
 $categories = [
     [
         "id" => 1,
@@ -31,6 +33,7 @@ $categories = [
         "css_class" => "promo__item--other",
     ],
 ];
+
 $items = [
     [
         "name" => "2014 Rossignol District Snowboard",
@@ -69,3 +72,4 @@ $items = [
         "url" => "img/lot-6.jpg"
     ]
 ];
+*/
