@@ -5,28 +5,21 @@ require_once 'data.php';
 $is_auth = rand(0, 1);
 
 $user_name = 'Николай'; // укажите здесь ваше имя
-/* Для вывода списка категорий*/
-if (!$link) {
-    $error = mysqli_connect_error();
-    $content = include_template('error.php', ['error' => $error]);
-} else {
-    $sql = 'SELECT id, name, css_class FROM category';
-    $result = mysqli_query($link, $sql);
 
-    if ($result) {
-        $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    } else {
-        $error = mysqli_error($link);
-        $content = include_template('error.php', ['error' => $error]);
-    }
+/* Для получения $categories*/
+$sql = "SELECT id, name, css_class FROM category";
+$stmt = db_get_prepare_stmt($link, $sql);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+if ($result) {
+    $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
+} else {
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
 }
 
-/* Для получения items*/
-if (!$link) {
-    $error = mysqli_connect_error();
-    $content = include_template('error.php', ['error' => $error]);
-} else {
-    $sql = 'SELECT l.name,
+/* Для получения $items*/
+$sql = 'SELECT l.name,
        l.price,
        l.url,
        c.name                                                                          AS category,
@@ -42,16 +35,17 @@ WHERE l.completion_date > now()
 GROUP BY l.id, l.name, l.url, l.price, l.creation_date, c.name
 ORDER BY l.creation_date DESC
 LIMIT 9';
-    $result = mysqli_query($link, $sql);
-
-    if ($result) {
-        $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    } else {
-        $error = mysqli_error($link);
-        $content = include_template('error.php', ['error' => $error]);
-    }
+$stmt = db_get_prepare_stmt($link, $sql);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+if ($result) {
+    $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
+} else {
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
 }
 
+/*Сборка шаблона Главной страницы*/
 $page_content = include_template('index.php', ['items' => $items, 'categories' => $categories]);
 $layout_content = include_template('layout.php', [
     'content' => $page_content,
