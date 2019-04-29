@@ -7,7 +7,7 @@ function format_cost(float $cost): string
     $cost = ceil($cost);
     if ($cost >= 1000) {
         $result = number_format($cost, 0, "", " ");
-    }   else {
+    } else {
         $result = $cost;
     }
     return $result . " <b class=\"rub\">р</b>";
@@ -29,14 +29,61 @@ function time_to_closing_date(int $timestamp_to_closing_date): string
 function second_to_closing_date(int $timestamp_of_end): int
 {
     $timestamp_to_closing_date = $timestamp_of_end - strtotime("now");
-    return($timestamp_to_closing_date);
+    return ($timestamp_to_closing_date);
 }
 
 function color_hour_to_closing_date(int $timestamp_to_closing_date): string
 {
     if ($timestamp_to_closing_date <= 3600) {
         $result = " timer--finishing";
-        return($result);
+        return ($result);
     }
     return "";
+}
+
+/* Функция для получения $categories
+- принимает ресурс соединения
+- возвращает массив с категориями или страницу ошибки*/
+function get_categories($link): array
+{
+    $sql = "SELECT id, name, css_class FROM category";
+    $stmt = db_get_prepare_stmt($link, $sql);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if ($result !== false) {
+        return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    } else {
+        $error = mysqli_error($link);
+    }
+    $content = include_template('error.php', ['error' => $error]);
+    print($content);
+    die();
+}
+
+/* Функция для получения $items
+- принимает ресурс соединения
+- возвращает массив с лотами или страницу ошибки*/
+function get_items($link): array
+{
+    $sql = 'SELECT l.name,
+       l.price,
+       l.url,
+       c.name                                                                          AS category,
+       l.creation_date
+FROM lot l
+         LEFT JOIN category c
+                   ON l.category_id = c.id
+WHERE l.completion_date > now()
+ORDER BY l.creation_date DESC
+LIMIT 9';
+    $stmt = db_get_prepare_stmt($link, $sql);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if ($result !== false) {
+        return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
+    print($content);
+    die();
 }
