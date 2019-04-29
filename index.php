@@ -7,7 +7,7 @@ $is_auth = rand(0, 1);
 $user_name = 'Николай'; // укажите здесь ваше имя
 
 
-$categories = get_categores($link);
+$categories = get_categories($link);
 $items = get_items($link);
 
 /*Сборка шаблона Главной страницы*/

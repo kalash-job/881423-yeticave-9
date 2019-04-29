@@ -44,7 +44,7 @@ function color_hour_to_closing_date(int $timestamp_to_closing_date): string
 /* Функция для получения $categories
 - принимает ресурс соединения
 - возвращает массив с категориями или страницу ошибки*/
-function get_categores($link): array
+function get_categories($link): array
 {
     $sql = "SELECT id, name, css_class FROM category";
     $stmt = db_get_prepare_stmt($link, $sql);
