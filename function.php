@@ -63,15 +63,7 @@ function get_categories($link): array
 {
     $sql = "SELECT id, name, css_class FROM category";
     $stmt = db_get_prepare_stmt($link, $sql);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    if ($result !== false) {
-        return mysqli_fetch_all($result, MYSQLI_ASSOC);
-    }
-    $error = mysqli_error($link);
-    $content = include_template('error.php', ['error' => $error]);
-    print($content);
-    die();
+    return select($stmt);
 }
 
 /** Функция для получения $items.
@@ -96,15 +88,7 @@ WHERE l.completion_date > now()
 ORDER BY l.creation_date DESC
 LIMIT 9';
     $stmt = db_get_prepare_stmt($link, $sql);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    if ($result !== false) {
-        return mysqli_fetch_all($result, MYSQLI_ASSOC);
-    }
-    $error = mysqli_error($link);
-    $content = include_template('error.php', ['error' => $error]);
-    print($content);
-    die();
+    return select($stmt);
 }
 
 /** Функция для получения массива $current_lot.
@@ -135,13 +119,23 @@ WHERE l.id = ' . '?' .
         ' GROUP BY l.id, l.name, l.url, l.price, l.creation_date, c.name, l.completion_date, l.bid_step, l.description';
 
     $stmt = db_get_prepare_stmt($link, $sql, [$lot_id]);
+    return select($stmt);
+}
+
+/** Функция для работы с подготовленным выражением с параметрами
+ * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
+ * @param $stmt
+ * @return array|null
+ */
+function select($stmt)
+{
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     if ($result !== false) {
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
     $error = mysqli_error($link);
-    $content = include_template('error . php', ['error' => $error]);
+    $content = include_template('error.php', ['error' => $error]);
     print($content);
     die();
 }

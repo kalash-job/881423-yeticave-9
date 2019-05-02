@@ -14,6 +14,7 @@ if (isset($_GET['id'])) {
 }
 /*check_id($link, $lot_id);*/
 $current_lot = get_current_lot($link, $lot_id);
+$current_lot = $current_lot[0] ?? null;
 if ($current_lot == null) {
     header("Location: /404.php");
 } else {
@@ -22,7 +23,7 @@ if ($current_lot == null) {
     $layout_content = include_template('layout.php', [
         'content' => $page_content,
         'categories' => $categories,
-        'title' => $current_lot[0]['name']
+        'title' => $current_lot['name']
     ]);
     print($layout_content);
 }
