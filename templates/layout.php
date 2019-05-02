@@ -46,9 +46,8 @@ $user_name = 'Николай'; // укажите здесь ваше имя
             </nav>
         </div>
     </header>
-    <main class="container">
         <?= $content; ?>
-    </main>
+
 </div>
 
 <footer class="main-footer">
