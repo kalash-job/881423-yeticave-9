@@ -9,9 +9,7 @@
         </ul>
     </nav>
     <section class="lot-item container">
-        <?php foreach ($current_lot
-
-        as $value): ?>
+        <?php foreach ($current_lot as $value): ?>
         <h2><?= $value["name"]; ?></h2>
         <div class="lot-item__content">
             <div class="lot-item__left">

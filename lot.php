@@ -12,15 +12,17 @@ if (isset($_GET['id'])) {
 } else {
     header("Location: /404.php");
 }
-check_id($link, $lot_id);
-
-$lots_name = get_lots_name_from_id($link, $lot_id);
+/*check_id($link, $lot_id);*/
 $current_lot = get_current_lot($link, $lot_id);
-/*Сборка шаблона страницы лота*/
-$page_content = include_template('lot.php', ['current_lot' => $current_lot, 'categories' => $categories]);
-$layout_content = include_template('layout.php', [
-    'content' => $page_content,
-    'categories' => $categories,
-    'title' => $lots_name
-]);
-print($layout_content);
+if ($current_lot == null) {
+    header("Location: /404.php");
+} else {
+    /*Сборка шаблона страницы лота*/
+    $page_content = include_template('lot.php', ['current_lot' => $current_lot, 'categories' => $categories]);
+    $layout_content = include_template('layout.php', [
+        'content' => $page_content,
+        'categories' => $categories,
+        'title' => $current_lot[0]['name']
+    ]);
+    print($layout_content);
+}
