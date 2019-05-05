@@ -35,7 +35,17 @@ $form_item_error_class = [
     'lot_date' => ''
 ];
 
-$errors = [];
+$errors = [
+    'lot_name' => NULL,
+    'category' => NULL,
+    'message' => NULL,
+    'lot_rate' => NULL,
+    'lot_step' => NULL,
+    'lot_image' => NULL,
+    'form_add_lot' => NULL,
+    'lot_date' => NULL
+];
+$num_errors = 0;
 /*проверка на отправленность формы*/
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $new_lot = $_POST;
@@ -46,20 +56,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($_POST[$key])) {
             $errors[$key] = $error_note;
             $form_item_error_class[$key] = $error_class;
+            $num_errors += 1;
             /*Проверяем соответствие формата и значений полей в массиве $_POST техническому заданию.
     Если поле заполнено не правильно, добавляем имя этого поля в массив с ошибками*/
         } elseif ($key === "lot_rate" && (gettype((int)$_POST[$key]) !== "integer" || (int)$_POST[$key] <= 0)) {
             $errors[$key] = $format_errors[$key];
             $form_item_error_class[$key] = $error_class;
+            $num_errors += 1;
         } elseif ($key === "lot_step" && (gettype((int)$_POST[$key]) !== "integer" || (int)$_POST[$key] <= 0)) {
             $errors[$key] = $format_errors[$key];
             $form_item_error_class[$key] = $error_class;
+            $num_errors += 1;
         } elseif ($key === "lot_date" && is_date_valid((string)$_POST[$key]) === false) {
             $errors[$key] = $format_errors[$key];
             $form_item_error_class[$key] = $error_class;
+            $num_errors += 1;
         } elseif ($key === "category" && $_POST[$key] === "Выберите категорию") {
             $errors[$key] = $format_errors[$key];
             $form_item_error_class[$key] = $error_class;
+            $num_errors += 1;
         }
     }
     /*получаем имя и путь к файлу изображения лота из массива $_FILES при их наличии в массиве*/
@@ -73,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($file_type !== "image/jpeg" && $file_type !== "image/png") {
                 $errors['lot_image'] = 'Загрузите изображение лота в правильном формате (png или jpeg)';
                 $form_item_error_class['lot_image'] = $error_class;
+                $num_errors += 1;
             } else {
                 /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
                 if ($file_type === "image/jpeg") {
@@ -86,13 +102,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             $errors['lot_image'] = 'Вы не загрузили файл';
             $form_item_error_class['lot_image'] = $error_class;
+            $num_errors += 1;
         }
 
     } else {
         $errors['lot_image'] = 'Вы не загрузили файл';
         $form_item_error_class['lot_image'] = $error_class;
+        $num_errors += 1;
     }
-    if (count($errors)) {
+    if ($num_errors !== 0) {
         /*Подключаем шаблон страницы добавления лота с формой,
         передаем в шаблон список ошибок, справочник с названиями и данные из формы*/
         $form_item_error_class['form_add_lot'] = " form--invalid";
