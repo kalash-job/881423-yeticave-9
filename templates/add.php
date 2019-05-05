@@ -30,31 +30,31 @@
             $form_errors = " form--invalid";
             if (isset($errors['lot_name'])) {
                 $lot_name_error = " form__item--invalid";
-                $lot_name_error_note = "Введите наименование лота";
+                $lot_name_error_note = $errors['lot_name'];
             }
             if (isset($errors['category'])) {
                 $lot_category_error = " form__item--invalid";
-                $lot_category_error_note = "Выберите категорию";
+                $lot_category_error_note = $errors['category'];
             }
             if (isset($errors['message'])) {
                 $lot_message_error = " form__item--invalid";
-                $lot_message_error_note = "Напишите описание лота";
+                $lot_message_error_note = $errors['message'];
             }
             if (isset($errors['lot_rate'])) {
                 $lot_rate_error = " form__item--invalid";
-                $lot_rate_error_note = "Введите начальную цену";
+                $lot_rate_error_note = $errors['lot_rate'];
             }
             if (isset($errors['lot_step'])) {
                 $lot_step_error = " form__item--invalid";
-                $lot_step_error_note = "Введите шаг ставки";
+                $lot_step_error_note = $errors['lot_step'];
             }
             if (isset($errors['lot_date'])) {
                 $lot_date_error = " form__item--invalid";
-                $lot_date_error_note = "Введите дату завершения торгов";
+                $lot_date_error_note = $errors['lot_date'];
             }
             if (isset($errors['lot_image'])) {
                 $lot_image_error = " form__item--invalid";
-                $lot_image_error_note = "Загрузите изображение лота в правильном формате (png или jpeg)";
+                $lot_image_error_note = $errors['lot_image'];
             }
         } else {
             $form_errors = "";
@@ -106,8 +106,9 @@
                 <label for="lot-img">
                     Добавить
                 </label>
+                <span class="form__error"><?= $lot_image_error_note; ?></span>
             </div>
-            <span class="form__error"><?= $lot_image_error_note; ?></span>
+
         </div>
         <div class="form__container-three">
             <div class="form__item form__item--small<?= $lot_rate_error; ?>">
@@ -124,8 +125,9 @@
             </div>
             <div class="form__item<?= $lot_date_error; ?>">
                 <label for="lot-date">Дата окончания торгов <sup>*</sup></label>
+                <?php $value = isset($new_lot['lot_date']) ? ' value="' . $new_lot['lot_date'] . '"' : ""; ?>
                 <input class="form__input-date" id="lot-date" type="text" name="lot_date"
-                       placeholder="Введите дату в формате ГГГГ-ММ-ДД">
+                       placeholder="Введите дату в формате ГГГГ-ММ-ДД"<?= $value; ?>>
                 <span class="form__error"><?= $lot_date_error_note; ?></span>
             </div>
         </div>

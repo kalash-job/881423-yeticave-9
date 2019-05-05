@@ -10,23 +10,36 @@ $categories = get_categories($link);
 /*проверка на отправленность формы*/
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $new_lot = $_POST;
-    $required = ['lot_name', 'category', 'message', 'lot_rate', 'lot_step', 'lot_date'];
+    $required = [
+        'lot_name' => 'Введите наименование лота',
+        'category' => 'Выберите категорию',
+        'message' => 'Напишите описание лота',
+        'lot_rate' => 'Введите начальную цену',
+        'lot_step' => 'Введите шаг ставки',
+        'lot_date' => 'Введите дату завершения торгов'
+    ];
     $errors = [];
     /*ПРоверяем наличие и заполненность обязательных полей в массиве $_POST.
     Если поле не заполнено, добавляем имя этого поля в массив с ошибками*/
-    foreach ($required as $key) {
+    $format_errors = [
+        'category' => 'Выберите категорию',
+        'lot_rate' => 'В это поле нужно ввести число больше нуля',
+        'lot_step' => 'В это поле нужно ввести число больше нуля',
+        'lot_date' => 'Дату нужно ввести в формате ГГГГ-ММ-ДД'
+    ];
+    foreach ($required as $key => $error_note) {
         if (empty($_POST[$key])) {
-            $errors[$key] = 'Это поле необходимо заполнить';
+            $errors[$key] = $error_note;
             /*Проверяем соответствие формата и значений полей в массиве $_POST техническому заданию.
     Если поле заполнено не правильно, добавляем имя этого поля в массив с ошибками*/
         } elseif ($key === "lot_rate" && (gettype((int)$_POST[$key]) !== "integer" || (int)$_POST[$key] <= 0)) {
-            $errors[$key] = 'В это поле нужно ввести число больше нуля';
+            $errors[$key] = $format_errors[$key];
         } elseif ($key === "lot_step" && (gettype((int)$_POST[$key]) !== "integer" || (int)$_POST[$key] <= 0)) {
-            $errors[$key] = 'В это поле нужно ввести число больше нуля';
+            $errors[$key] = $format_errors[$key];
         } elseif ($key === "lot_date" && is_date_valid((string)$_POST[$key]) === false) {
-            $errors[$key] = 'Дату нужно ввести в формате ГГГГ-ММ-ДД';
+            $errors[$key] = $format_errors[$key];
         } elseif ($key === "category" && $_POST[$key] === "Выберите категорию") {
-            $errors[$key] = 'Не выбрана категория';
+            $errors[$key] = $format_errors[$key];
         }
     }
     /*получаем имя и путь к файлу изображения лота из массива $_FILES при их наличии в массиве*/
@@ -38,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $file_type = finfo_file($finfo, $tmp_name);
             if ($file_type !== "image/jpeg" && $file_type !== "image/png") {
-                $errors['file'] = 'Загрузите изображение лота в правильном формате (png или jpeg)';
+                $errors['lot_image'] = 'Загрузите изображение лота в правильном формате (png или jpeg)';
             } else {
                 /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
                 if ($file_type === "image/jpeg") {
@@ -50,11 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $new_lot['path'] = $path;
             }
         } else {
-            $errors['file'] = 'Вы не загрузили файл';
+            $errors['lot_image'] = 'Вы не загрузили файл';
         }
 
     } else {
-        $errors['file'] = 'Вы не загрузили файл';
+        $errors['lot_image'] = 'Вы не загрузили файл';
     }
     if (count($errors)) {
         /*Подключаем шаблон страницы добавления лота с формой,
