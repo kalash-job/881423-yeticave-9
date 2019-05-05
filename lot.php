@@ -12,7 +12,6 @@ if (isset($_GET['id'])) {
 } else {
     header("Location: /404.php");
 }
-/*check_id($link, $lot_id);*/
 $current_lot = get_current_lot($link, $lot_id);
 $current_lot = $current_lot[0] ?? null;
 if ($current_lot == null) {

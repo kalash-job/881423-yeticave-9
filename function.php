@@ -139,3 +139,51 @@ function select($stmt)
     print($content);
     die();
 }
+
+/*Функция добавления сведений о новом лоте в БД.
+Получает ресурс соединения, массив $new_lot с данными по лоту.
+Приводит элемены массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота к нужному формату.
+Проверяет успешность добавления лота в БД. Уточняет id нового лота.
+Формирует ссылку на страницу нового лота. Переводит пользователя на страницу загруженного лота.
+Если ничего не добавилось, функция показывает ошибку и умирает.*/
+function add_new_lot($link, $new_lot)
+{
+    $new_lot['lot_date'] = $new_lot['lot_date'] . " 00:00:00";
+    $new_lot['path'] = "uploads/" . $new_lot['path'];
+    $sql = 'INSERT INTO lot
+(name, description, url, price, completion_date, bid_step, category_id, user_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, 1)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $new_lot['lot_name'],
+        $new_lot['message'],
+        $new_lot['path'],
+        $new_lot['lot_rate'],
+        $new_lot['lot_date'],
+        $new_lot['lot_step'],
+        $new_lot['category']
+    ]);
+    $new_id = insert($stmt);
+    if ($new_id !== null) {
+        $path_lot_page = "Location: /lot.php?id=" . (string)$new_id;
+        /*возвращаем id добавленной записи*/
+        return header($path_lot_page);
+    }
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
+    print($content);
+    die();
+}
+
+function insert($stmt)
+{
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_affected_rows($stmt);
+    if ($result !== 0) {
+        /*возвращаем id добавленной записи*/
+        return mysqli_stmt_insert_id($stmt);
+    }
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
+    print($content);
+    die();
+}
