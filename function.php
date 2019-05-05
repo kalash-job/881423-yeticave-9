@@ -127,7 +127,7 @@ WHERE l.id = ' . '?' .
  * @param $stmt
  * @return array|null
  */
-function select($stmt)
+function select($stmt): ?array
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -140,22 +140,22 @@ function select($stmt)
     die();
 }
 
-/**Функция добавления сведений о новом лоте в БД.
+/** Функция получения id нового лота в БД.
  * Получает ресурс соединения, массив $new_lot с данными по лоту.
  * Приводит элемены массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота к нужному формату.
- * Проверяет успешность добавления лота в БД. Уточняет id нового лота.
- * Формирует ссылку на страницу нового лота. Переводит пользователя на страницу загруженного лота.
+ * Проверяет успешность добавления лота в БД. Уточняет и возвращает id нового лота.
  * Если ничего не добавилось, функция показывает ошибку и умирает.
  * @param $link
- * @param $new_lot
+ * @param array $new_lot
+ * @return int|null
  */
-function add_new_lot($link, $new_lot)
+function get_new_lot_id($link, array $new_lot): ?int
 {
     $new_lot['lot_date'] = $new_lot['lot_date'] . " 00:00:00";
     $new_lot['path'] = "uploads/" . $new_lot['path'];
     $sql = 'INSERT INTO lot
 (name, description, url, price, completion_date, bid_step, category_id, user_id)
-VALUES (?, ?, ?, ?, ?, ?, ?, 1)';
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
     $stmt = db_get_prepare_stmt($link, $sql, [
         $new_lot['lot_name'],
         $new_lot['message'],
@@ -163,13 +163,13 @@ VALUES (?, ?, ?, ?, ?, ?, ?, 1)';
         $new_lot['lot_rate'],
         $new_lot['lot_date'],
         $new_lot['lot_step'],
-        $new_lot['category']
+        $new_lot['category'],
+        1
     ]);
     $new_id = insert($stmt);
     if ($new_id !== null) {
-        $path_lot_page = "Location: /lot.php?id=" . (string)$new_id;
         /*возвращаем id добавленной записи*/
-        return header($path_lot_page);
+        return $new_id;
     }
     $error = mysqli_error($link);
     $content = include_template('error.php', ['error' => $error]);
@@ -177,12 +177,12 @@ VALUES (?, ?, ?, ?, ?, ?, ?, 1)';
     die();
 }
 
-/**Функция для работы с подготовленным выражением с параметрами при INSERT-запросах
+/** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах
  * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
  * @param $stmt
- * @return mixed
+ * @return int|null
  */
-function insert($stmt)
+function insert($stmt): ?int
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_affected_rows($stmt);

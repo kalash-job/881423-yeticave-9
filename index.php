@@ -2,11 +2,6 @@
 declare(strict_types=1);
 require_once 'init.php';
 
-$is_auth = rand(0, 1);
-
-$user_name = 'Николай'; // укажите здесь ваше имя
-
-
 $categories = get_categories($link);
 $items = get_items($link);
 
