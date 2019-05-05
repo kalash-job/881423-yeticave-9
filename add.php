@@ -59,7 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (count($errors)) {
         /*Подключаем шаблон страницы добавления лота с формой,
         передаем в шаблон список ошибок, справочник с названиями и данные из формы*/
-        $page_content = include_template('add.php', ['categories' => $categories, 'errors' => $errors, 'new_lot' => $new_lot]);
+        $page_content = include_template('add.php',
+            ['categories' => $categories, 'errors' => $errors, 'new_lot' => $new_lot]);
         $layout_content = include_template('layout.php', [
             'content' => $page_content,
             'categories' => $categories,

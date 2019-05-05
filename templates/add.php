@@ -76,7 +76,7 @@
                 <label for="category">Категория <sup>*</sup></label>
                 <select id="category" name="category">
                     <option>Выберите категорию</option>
-                    <?php foreach ($categories as $categories_option):?>
+                    <?php foreach ($categories as $categories_option): ?>
                         <?php if (isset($new_lot['category'])) {
                             if ((int)$new_lot['category'] === $categories_option["id"]) {
                                 $value = ' selected';
@@ -86,7 +86,8 @@
                         } else {
                             $value = '';
                         } ?>
-                        <option<?= $value; ?> value="<?= $categories_option["id"]; ?>"><?= $categories_option["name"]; ?></option>
+                        <option<?= $value; ?>
+                                value="<?= $categories_option["id"]; ?>"><?= $categories_option["name"]; ?></option>
                     <?php endforeach ?>
                 </select>
                 <span class="form__error"><?= $lot_category_error_note; ?></span>
