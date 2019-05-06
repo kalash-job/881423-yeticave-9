@@ -122,17 +122,73 @@ WHERE l.id = ' . '?' .
     return select($stmt);
 }
 
-/** Функция для работы с подготовленным выражением с параметрами
+/** Функция для работы с подготовленным выражением с параметрами при SELECT-запросах
  * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
  * @param $stmt
  * @return array|null
  */
-function select($stmt)
+function select($stmt): ?array
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     if ($result !== false) {
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
+    print($content);
+    die();
+}
+
+/** Функция получения id нового лота в БД.
+ * Получает ресурс соединения, массив $new_lot с данными по лоту.
+ * Приводит элемены массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота к нужному формату.
+ * Проверяет успешность добавления лота в БД. Уточняет и возвращает id нового лота.
+ * Если ничего не добавилось, функция показывает ошибку и умирает.
+ * @param $link
+ * @param array $new_lot
+ * @return int|null
+ */
+function get_new_lot_id($link, array $new_lot): ?int
+{
+    $new_lot['lot_date'] = $new_lot['lot_date'] . " 00:00:00";
+    $new_lot['path'] = "uploads/" . $new_lot['path'];
+    $sql = 'INSERT INTO lot
+(name, description, url, price, completion_date, bid_step, category_id, user_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $new_lot['lot_name'],
+        $new_lot['message'],
+        $new_lot['path'],
+        $new_lot['lot_rate'],
+        $new_lot['lot_date'],
+        $new_lot['lot_step'],
+        $new_lot['category'],
+        1
+    ]);
+    $new_id = insert($stmt);
+    if ($new_id !== null) {
+        /*возвращаем id добавленной записи*/
+        return $new_id;
+    }
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
+    print($content);
+    die();
+}
+
+/** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах
+ * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
+ * @param $stmt
+ * @return int|null
+ */
+function insert($stmt): ?int
+{
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_affected_rows($stmt);
+    if ($result !== 0) {
+        /*возвращаем id добавленной записи*/
+        return mysqli_stmt_insert_id($stmt);
     }
     $error = mysqli_error($link);
     $content = include_template('error.php', ['error' => $error]);

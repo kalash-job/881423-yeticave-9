@@ -9,14 +9,14 @@
         </ul>
     </nav>
     <section class="lot-item container">
-        <h2><?= $current_lot["name"]; ?></h2>
+        <h2><?= htmlspecialchars($current_lot["name"]); ?></h2>
         <div class="lot-item__content">
             <div class="lot-item__left">
                 <div class="lot-item__image">
-                    <img src="../<?= $current_lot["url"]; ?>" width="730" height="548" alt="<?= $current_lot["name"]; ?>">
+                    <img src="../<?= $current_lot["url"]; ?>" width="730" height="548" alt="<?= htmlspecialchars($current_lot["name"]); ?>">
                 </div>
                 <p class="lot-item__category">Категория: <span><?= $current_lot["category"]; ?></span></p>
-                <p class="lot-item__description"><?= $current_lot["description"]; ?></p>
+                <p class="lot-item__description"><?= htmlspecialchars($current_lot["description"]); ?></p>
             </div>
             <div class="lot-item__right">
                 <div class="lot-item__state">

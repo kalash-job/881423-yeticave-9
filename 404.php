@@ -2,10 +2,6 @@
 declare(strict_types=1);
 http_response_code(404);
 require_once 'init.php';
-$is_auth = rand(0, 1);
-
-$user_name = 'Николай'; // укажите здесь ваше имя
-
 
 $categories = get_categories($link);
 
