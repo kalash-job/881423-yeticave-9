@@ -124,10 +124,10 @@ WHERE l.id = ' . '?' .
 
 /** Функция для работы с подготовленным выражением с параметрами при SELECT-запросах
  * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
- * @param $stmt
+ * @param mysqli_stmt $stmt
  * @return array|null
  */
-function select($stmt): ?array
+function select(mysqli_stmt $stmt): ?array
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -141,15 +141,16 @@ function select($stmt): ?array
 }
 
 /** Функция получения id нового лота в БД.
- * Получает ресурс соединения, массив $new_lot с данными по лоту.
- * Приводит элемены массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота к нужному формату.
+ * Получает ресурс соединения, массив $new_lot с данными по лоту, и id пользователя.
+ * Приводит элемены массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота, к нужному формату.
  * Проверяет успешность добавления лота в БД. Уточняет и возвращает id нового лота.
  * Если ничего не добавилось, функция показывает ошибку и умирает.
  * @param $link
  * @param array $new_lot
+ * @param int $user_id
  * @return int|null
  */
-function get_new_lot_id($link, array $new_lot): ?int
+function get_new_lot_id($link, array $new_lot, int $user_id): ?int
 {
     $new_lot['lot_date'] = $new_lot['lot_date'] . " 00:00:00";
     $new_lot['path'] = "uploads/" . $new_lot['path'];
@@ -164,7 +165,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         $new_lot['lot_date'],
         $new_lot['lot_step'],
         $new_lot['category'],
-        1
+        $user_id
     ]);
     $new_id = insert($stmt);
     if ($new_id !== null) {
@@ -179,10 +180,10 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
 /** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах
  * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
- * @param $stmt
+ * @param mysqli_stmt $stmt
  * @return int|null
  */
-function insert($stmt): ?int
+function insert(mysqli_stmt $stmt): ?int
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_affected_rows($stmt);
