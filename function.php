@@ -142,7 +142,7 @@ function select(mysqli_stmt $stmt): ?array
 
 /** Функция получения id нового лота в БД.
  * Получает ресурс соединения, массив $new_lot с данными по лоту, и id пользователя.
- * Приводит элемены массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота, к нужному формату.
+ * Приводит элементы массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота, к нужному формату.
  * Проверяет успешность добавления лота в БД. Уточняет и возвращает id нового лота.
  * Если ничего не добавилось, функция показывает ошибку и умирает.
  * @param $link
@@ -179,7 +179,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 }
 
 /** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах
- * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
+ * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает id добавленного лота, либо умирает с показом ошибки.
  * @param mysqli_stmt $stmt
  * @return int|null
  */
@@ -190,6 +190,74 @@ function insert(mysqli_stmt $stmt): ?int
     if ($result !== 0) {
         /*возвращаем id добавленной записи*/
         return mysqli_stmt_insert_id($stmt);
+    }
+    $error = mysqli_error($link);
+    $content = include_template('error.php', ['error' => $error]);
+    print($content);
+    die();
+}
+
+/**Функция проверки уникальности email
+ * Получает ресурс соединения и введенный при регистрации email.
+ * При наличии такого email у ранее зарегистрированных пользователей, функция возвращает false.
+ * При уникальности email функция возвращает true.
+ * @param $link
+ * @param string $email
+ * @return bool|null
+ */
+function check_unique_email($link, string $email): ?bool
+{
+    $sql = 'SELECT u.id
+FROM user u
+WHERE u.email = "' . $email . '"';
+    $stmt = db_get_prepare_stmt($link, $sql);
+    $current_user_id = select($stmt);
+    if (!isset($current_user_id[0])) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/** Функция добавления нового пользователя
+ * Получает ресурс соединения и массив с параметрами по добавляемому пользователю.
+ * Приводит элементы массива $new_user, отвечающие за путь к картинке аватара, к нужному формату.
+ * Выполняет запрос по добавлению пользователя в БД.
+ * @param $link
+ * @param array $new_user
+ */
+function add_new_user($link, array $new_user)
+{
+    if (isset($new_user['path'])) {
+        $new_user['path'] = "uploads/" . $new_user['path'];
+    } else {
+        $new_user['path'] = null;
+    }
+
+    $sql = 'INSERT INTO user
+(email, password, avatar_path, name, contact)
+VALUES (?, ?, ?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $new_user['email'],
+        $new_user['password'],
+        $new_user['path'],
+        $new_user['name'],
+        $new_user['message']
+    ]);
+    insert_user($stmt);
+    return;
+}
+
+/** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах по вставке в БД параметров нового пользователя
+ * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, либо умирает с показом ошибки в случае отсутствия вставленных строк.
+ * @param mysqli_stmt $stmt
+ */
+function insert_user(mysqli_stmt $stmt)
+{
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_affected_rows($stmt);
+    if ($result !== 0) {
+        return;
     }
     $error = mysqli_error($link);
     $content = include_template('error.php', ['error' => $error]);
