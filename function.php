@@ -56,10 +56,10 @@ function color_hour_to_closing_date(int $timestamp_to_closing_date): string
 /** Функция для получения $categories.
  * Принимает ресурс соединения.
  * Возвращает массив с категориями или страницу ошибки.
- * @param $link
+ * @param mysqli $link
  * @return array
  */
-function get_categories($link): array
+function get_categories(mysqli $link): array
 {
     $sql = "SELECT id, name, css_class FROM category";
     $stmt = db_get_prepare_stmt($link, $sql);
@@ -69,10 +69,10 @@ function get_categories($link): array
 /** Функция для получения $items.
  * Принимает ресурс соединения.
  * Возвращает массив с лотами для вывода на главную страницу, или страницу ошибки.
- * @param $link
+ * @param mysqli $link
  * @return array
  */
-function get_items($link): array
+function get_items(mysqli $link): array
 {
     $sql = 'SELECT l.name,
        l.price,
@@ -94,11 +94,11 @@ LIMIT 9';
 /** Функция для получения массива $current_lot.
  * Принимает ресурс соединения и ID лота.
  * Возвращает массив с данными по лоту для вывода на страницу лота, или страницу ошибки.
- * @param $link
+ * @param mysqli $link
  * @param int $lot_id
  * @return array|null
  */
-function get_current_lot($link, int $lot_id): ?array
+function get_current_lot(mysqli $link, int $lot_id): ?array
 {
     $sql = 'SELECT l.name,
        l.price,
@@ -145,12 +145,12 @@ function select(mysqli_stmt $stmt): ?array
  * Приводит элементы массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота, к нужному формату.
  * Проверяет успешность добавления лота в БД. Уточняет и возвращает id нового лота.
  * Если ничего не добавилось, функция показывает ошибку и умирает.
- * @param $link
+ * @param mysqli $link
  * @param array $new_lot
  * @param int $user_id
  * @return int|null
  */
-function get_new_lot_id($link, array $new_lot, int $user_id): ?int
+function get_new_lot_id(mysqli $link, array $new_lot, int $user_id): ?int
 {
     $new_lot['lot_date'] = $new_lot['lot_date'] . " 00:00:00";
     $new_lot['path'] = "uploads/" . $new_lot['path'];
@@ -179,7 +179,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 }
 
 /** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах
- * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает id добавленного лота, либо умирает с показом ошибки.
+ * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает id добавленного лота/пользователя, либо умирает с показом ошибки.
  * @param mysqli_stmt $stmt
  * @return int|null
  */
@@ -201,11 +201,11 @@ function insert(mysqli_stmt $stmt): ?int
  * Получает ресурс соединения и введенный при регистрации email.
  * При наличии такого email у ранее зарегистрированных пользователей, функция возвращает false.
  * При уникальности email функция возвращает true.
- * @param $link
+ * @param mysqli $link
  * @param string $email
  * @return bool|null
  */
-function check_unique_email($link, string $email): ?bool
+function check_unique_email(mysqli $link, string $email): ?bool
 {
     $sql = 'SELECT u.id
 FROM user u
@@ -223,10 +223,10 @@ WHERE u.email = "' . $email . '"';
  * Получает ресурс соединения и массив с параметрами по добавляемому пользователю.
  * Приводит элементы массива $new_user, отвечающие за путь к картинке аватара, к нужному формату.
  * Выполняет запрос по добавлению пользователя в БД.
- * @param $link
+ * @param mysqli $link
  * @param array $new_user
  */
-function add_new_user($link, array $new_user)
+function add_new_user(mysqli $link, array $new_user)
 {
     if (isset($new_user['path'])) {
         $new_user['path'] = "uploads/" . $new_user['path'];
@@ -244,23 +244,6 @@ VALUES (?, ?, ?, ?, ?)';
         $new_user['name'],
         $new_user['message']
     ]);
-    insert_user($stmt);
+    insert($stmt);
     return;
-}
-
-/** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах по вставке в БД параметров нового пользователя
- * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, либо умирает с показом ошибки в случае отсутствия вставленных строк.
- * @param mysqli_stmt $stmt
- */
-function insert_user(mysqli_stmt $stmt)
-{
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_affected_rows($stmt);
-    if ($result !== 0) {
-        return;
-    }
-    $error = mysqli_error($link);
-    $content = include_template('error.php', ['error' => $error]);
-    print($content);
-    die();
 }

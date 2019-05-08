@@ -44,4 +44,3 @@
             <?php endforeach ?>
         </ul>
     </section>
-</main>

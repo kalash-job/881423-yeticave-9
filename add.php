@@ -113,6 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         /*Подключаем шаблон страницы добавления лота с формой,
         передаем в шаблон список ошибок, справочник с названиями и данные из формы*/
         $form_item_error_class['form_add_lot'] = " form--invalid";
+        $top_menu = include_template('top-menu.php',
+            ['categories' => $categories]);
         $page_content = include_template('add.php',
             [
                 'categories' => $categories,
@@ -121,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'form_item_error_class' => $form_item_error_class
             ]);
         $layout_content = include_template('layout.php', [
+            'top_menu' => $top_menu,
             'content' => $page_content,
             'categories' => $categories,
             'new_lot' => $new_lot,
@@ -137,9 +140,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 } else {
     /*Сборка шаблона страницы добавления лота*/
+    $top_menu = include_template('top-menu.php',
+        ['categories' => $categories]);
     $page_content = include_template('add.php',
         ['categories' => $categories, 'errors' => $errors, 'form_item_error_class' => $form_item_error_class]);
     $layout_content = include_template('layout.php', [
+        'top_menu' => $top_menu,
         'content' => $page_content,
         'categories' => $categories,
         'errors' => $errors,

@@ -46,8 +46,10 @@ $user_name = 'Николай'; // укажите здесь ваше имя
             </nav>
         </div>
     </header>
+    <main>
+        <?= $top_menu; ?>
         <?= $content; ?>
-
+    </main>
 </div>
 
 <footer class="main-footer">

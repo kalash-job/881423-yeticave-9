@@ -93,6 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         /*Подключаем шаблон страницы регистрации пользователя с формой,
         передаем в шаблон список ошибок, справочник с названиями и данные из формы*/
         $sign_up_form_error_class['form_add_user'] = " form--invalid";
+        $top_menu = include_template('top-menu.php',
+            ['categories' => $categories]);
         $page_content = include_template('sign-up.php',
             [
                 'categories' => $categories,
@@ -101,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'sign_up_form_error_class' => $sign_up_form_error_class
             ]);
         $layout_content = include_template('layout.php', [
+            'top_menu' => $top_menu,
             'content' => $page_content,
             'categories' => $categories,
             'sign_up_errors' => $sign_up_errors,
@@ -116,6 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 } else {
     /*Сборка шаблона страницы регистрации нового пользователя*/
+    $top_menu = include_template('top-menu.php',
+        ['categories' => $categories]);
     $page_content = include_template('sign-up.php',
         [
             'categories' => $categories,
@@ -123,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'sign_up_form_error_class' => $sign_up_form_error_class
         ]);
     $layout_content = include_template('layout.php', [
+        'top_menu' => $top_menu,
         'content' => $page_content,
         'categories' => $categories,
         'sign_up_errors' => $sign_up_errors,
