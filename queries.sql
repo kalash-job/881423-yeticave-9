@@ -10,9 +10,9 @@ VALUES ("Доски и лыжи", "boards"),
 
 INSERT INTO user
     (email, name, password, contact)
-VALUES ("misha@email", "Михаил", "111111", "+77795484"),
-       ("lev@email", "Лев", "222222", "+778995484"),
-       ("nikolay@email", "Nikolay", "nnnnnn", "+788554665");
+VALUES ("misha@email.ru", "Михаил", "111111", "+77795484"),
+       ("lev@email.ru", "Лев", "222222", "+778995484"),
+       ("nikolay@email.ru", "Nikolay", "nnnnnn", "+788554665");
 
 INSERT INTO lot
 (name, description, url, price, completion_date, bid_step, category_id, user_id)

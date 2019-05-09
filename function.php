@@ -56,10 +56,10 @@ function color_hour_to_closing_date(int $timestamp_to_closing_date): string
 /** Функция для получения $categories.
  * Принимает ресурс соединения.
  * Возвращает массив с категориями или страницу ошибки.
- * @param $link
+ * @param mysqli $link
  * @return array
  */
-function get_categories($link): array
+function get_categories(mysqli $link): array
 {
     $sql = "SELECT id, name, css_class FROM category";
     $stmt = db_get_prepare_stmt($link, $sql);
@@ -69,10 +69,10 @@ function get_categories($link): array
 /** Функция для получения $items.
  * Принимает ресурс соединения.
  * Возвращает массив с лотами для вывода на главную страницу, или страницу ошибки.
- * @param $link
+ * @param mysqli $link
  * @return array
  */
-function get_items($link): array
+function get_items(mysqli $link): array
 {
     $sql = 'SELECT l.name,
        l.price,
@@ -94,11 +94,11 @@ LIMIT 9';
 /** Функция для получения массива $current_lot.
  * Принимает ресурс соединения и ID лота.
  * Возвращает массив с данными по лоту для вывода на страницу лота, или страницу ошибки.
- * @param $link
+ * @param mysqli $link
  * @param int $lot_id
  * @return array|null
  */
-function get_current_lot($link, int $lot_id): ?array
+function get_current_lot(mysqli $link, int $lot_id): ?array
 {
     $sql = 'SELECT l.name,
        l.price,
@@ -124,10 +124,10 @@ WHERE l.id = ' . '?' .
 
 /** Функция для работы с подготовленным выражением с параметрами при SELECT-запросах
  * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
- * @param $stmt
+ * @param mysqli_stmt $stmt
  * @return array|null
  */
-function select($stmt): ?array
+function select(mysqli_stmt $stmt): ?array
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -141,15 +141,16 @@ function select($stmt): ?array
 }
 
 /** Функция получения id нового лота в БД.
- * Получает ресурс соединения, массив $new_lot с данными по лоту.
- * Приводит элемены массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота к нужному формату.
+ * Получает ресурс соединения, массив $new_lot с данными по лоту, и id пользователя.
+ * Приводит элементы массива $new_lot, отвечающие за дату завершения лота и путь к картинке лота, к нужному формату.
  * Проверяет успешность добавления лота в БД. Уточняет и возвращает id нового лота.
  * Если ничего не добавилось, функция показывает ошибку и умирает.
- * @param $link
+ * @param mysqli $link
  * @param array $new_lot
+ * @param int $user_id
  * @return int|null
  */
-function get_new_lot_id($link, array $new_lot): ?int
+function get_new_lot_id(mysqli $link, array $new_lot, int $user_id): ?int
 {
     $new_lot['lot_date'] = $new_lot['lot_date'] . " 00:00:00";
     $new_lot['path'] = "uploads/" . $new_lot['path'];
@@ -164,7 +165,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         $new_lot['lot_date'],
         $new_lot['lot_step'],
         $new_lot['category'],
-        1
+        $user_id
     ]);
     $new_id = insert($stmt);
     if ($new_id !== null) {
@@ -178,11 +179,11 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 }
 
 /** Функция для работы с подготовленным выражением с параметрами при INSERT-запросах
- * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает его, либо умирает с показом ошибки.
- * @param $stmt
+ * Получает подготовленное выражение с параметрами, исполняет его и фетчит результат, и возвращает id добавленного лота/пользователя, либо умирает с показом ошибки.
+ * @param mysqli_stmt $stmt
  * @return int|null
  */
-function insert($stmt): ?int
+function insert(mysqli_stmt $stmt): ?int
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_affected_rows($stmt);
@@ -194,4 +195,55 @@ function insert($stmt): ?int
     $content = include_template('error.php', ['error' => $error]);
     print($content);
     die();
+}
+
+/**Функция проверки уникальности email
+ * Получает ресурс соединения и введенный при регистрации email.
+ * При наличии такого email у ранее зарегистрированных пользователей, функция возвращает false.
+ * При уникальности email функция возвращает true.
+ * @param mysqli $link
+ * @param string $email
+ * @return bool|null
+ */
+function check_unique_email(mysqli $link, string $email): ?bool
+{
+    $sql = 'SELECT u.id
+FROM user u
+WHERE u.email = "' . $email . '"';
+    $stmt = db_get_prepare_stmt($link, $sql);
+    $current_user_id = select($stmt);
+    if (!isset($current_user_id[0])) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/** Функция добавления нового пользователя
+ * Получает ресурс соединения и массив с параметрами по добавляемому пользователю.
+ * Приводит элементы массива $new_user, отвечающие за путь к картинке аватара, к нужному формату.
+ * Выполняет запрос по добавлению пользователя в БД.
+ * @param mysqli $link
+ * @param array $new_user
+ */
+function add_new_user(mysqli $link, array $new_user)
+{
+    if (isset($new_user['path'])) {
+        $new_user['path'] = "uploads/" . $new_user['path'];
+    } else {
+        $new_user['path'] = null;
+    }
+
+    $sql = 'INSERT INTO user
+(email, password, avatar_path, name, contact)
+VALUES (?, ?, ?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $new_user['email'],
+        $new_user['password'],
+        $new_user['path'],
+        $new_user['name'],
+        $new_user['message']
+    ]);
+    insert($stmt);
+    return;
 }

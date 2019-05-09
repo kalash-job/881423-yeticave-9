@@ -14,8 +14,11 @@ if ($current_lot == null) {
     header("Location: /404.php");
 } else {
     /*Сборка шаблона страницы лота*/
+    $top_menu = include_template('top-menu.php',
+        ['categories' => $categories]);
     $page_content = include_template('lot.php', ['current_lot' => $current_lot, 'categories' => $categories]);
     $layout_content = include_template('layout.php', [
+        'top_menu' => $top_menu,
         'content' => $page_content,
         'categories' => $categories,
         'title' => $current_lot['name']
