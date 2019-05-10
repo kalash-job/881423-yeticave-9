@@ -248,6 +248,11 @@ VALUES (?, ?, ?, ?, ?)';
     return;
 }
 
+/** Функция проверяет наличие email пользователя и возвращает массив с данными пользователя или null
+ * @param mysqli $link
+ * @param string $email
+ * @return array|null
+ */
 function get_user_data(mysqli $link, string $email): ?array
 {
     $sql = 'SELECT u.id,
@@ -259,6 +264,11 @@ WHERE u.email = ?';
     return select($stmt);
 }
 
+/** Функция возвращает имя пользователя по его id
+ * @param $link
+ * @param int $user_id
+ * @return array
+ */
 function get_username($link, int $user_id): array
 {
     $sql = "SELECT name FROM user
