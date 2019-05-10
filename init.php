@@ -11,7 +11,8 @@ if ($link === false) {
 mysqli_set_charset($link, "utf8");
 session_start();
 if (isset($_SESSION['user'])) {
-    $user_session = get_username($link, $_SESSION['user']);
+    $login_user_id = $_SESSION['user'];
+    $user_session = get_username($link, $login_user_id);
     $user_session['is_auth'] = 1;
 } else {
     $user_session['is_auth'] = 0;

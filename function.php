@@ -269,10 +269,10 @@ WHERE u.email = ?';
  * @param int $user_id
  * @return array
  */
-function get_username($link, int $user_id): array
+function get_username(mysqli $link, int $user_id): ?array
 {
-    $sql = "SELECT name FROM user
-WHERE id = $user_id";
+    $sql = 'SELECT name FROM user
+WHERE id = ' . $user_id;
     $stmt = db_get_prepare_stmt($link, $sql);
     $user_name = select($stmt);
     $user_name = $user_name[0] ?? null;
