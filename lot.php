@@ -16,11 +16,13 @@ if ($current_lot == null) {
     /*Сборка шаблона страницы лота*/
     $top_menu = include_template('top-menu.php',
         ['categories' => $categories]);
-    $page_content = include_template('lot.php', ['current_lot' => $current_lot, 'categories' => $categories]);
+    $page_content = include_template('lot.php',
+        ['current_lot' => $current_lot, 'categories' => $categories, 'user_session' => $user_session]);
     $layout_content = include_template('layout.php', [
         'top_menu' => $top_menu,
         'content' => $page_content,
         'categories' => $categories,
+        'user_session' => $user_session,
         'title' => $current_lot['name']
     ]);
     print($layout_content);

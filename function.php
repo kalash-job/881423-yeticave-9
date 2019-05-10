@@ -247,3 +247,24 @@ VALUES (?, ?, ?, ?, ?)';
     insert($stmt);
     return;
 }
+
+function get_user_data(mysqli $link, string $email): ?array
+{
+    $sql = 'SELECT u.id,
+       u.password,
+       u.email
+FROM user u
+WHERE u.email = ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$email]);
+    return select($stmt);
+}
+
+function get_username($link, int $user_id): array
+{
+    $sql = "SELECT name FROM user
+WHERE id = $user_id";
+    $stmt = db_get_prepare_stmt($link, $sql);
+    $user_name = select($stmt);
+    $user_name = $user_name[0] ?? null;
+    return $user_name;
+}
