@@ -278,3 +278,39 @@ WHERE id = ' . $user_id;
     $user_name = $user_name[0] ?? null;
     return $user_name;
 }
+
+/** Функция вычисляет, нужно ли показать блок добавления ставок в этом лоте этому пользователю
+ * Получает ресурс соединения, id пользователя, id лота, запрашивает в БД данные по ограничениям показа блока.
+ * На основании сопоставления с условиями показа возвращает true (показываем) или false (не показываем).
+ * @param mysqli $link
+ * @param int $user_id
+ * @param int $lot_id
+ * @return bool|null
+ */
+
+function show_adding_new_bid(mysqli $link, int $user_id, int $lot_id): ?bool
+{
+    $sql = 'SELECT l.id,
+       l.user_id
+FROM lot l
+WHERE l.id = ' . $lot_id . ' AND l.completion_date > now() AND l.user_id != ' . $user_id;
+    $stmt = db_get_prepare_stmt($link, $sql);
+    $table_result = select($stmt);
+    if ((!isset($table_result[0])) || $table_result[0] === null) {
+        return false;
+    }
+    //Определяем пользователя, сделавшего максимальную ставку.
+    $sql = 'SELECT b.lot_id,
+       b.bid_amount,
+       b.user_id
+FROM bid b
+WHERE b.lot_id = ' . $lot_id . '
+ORDER BY b.bid_amount LIMIT 1';
+    $stmt = db_get_prepare_stmt($link, $sql);
+    $max_bit_user = select($stmt);
+    $max_bit_user = $max_bit_user[0] ?? null;
+    if ((int)$max_bit_user['user_id'] === $user_id) {
+        return false;
+    }
+    return true;
+}

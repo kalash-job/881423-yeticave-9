@@ -13,6 +13,13 @@ $current_lot = $current_lot[0] ?? null;
 if ($current_lot == null) {
     header("Location: /404.php");
 } else {
+    /*Проверка условий показа блока добавления ставок*/
+    if (($user_session['is_auth'] === 1) && (show_adding_new_bid($link, $_SESSION['user'],
+                (int)$_GET['id']) === true)) {
+        $user_session['new_bid'] = true;
+    } else {
+        $user_session['new_bid'] = false; // ограничит показ блока добавления ставок в данном лоте для данного пользователя с открытой сессией
+    }
     /*Сборка шаблона страницы лота*/
     $top_menu = include_template('top-menu.php',
         ['categories' => $categories]);

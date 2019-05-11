@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ]);
         print($layout_content);
     } else {
-        $user_id = 1; // временное решение до подключения аутентификации
+        $user_id = $_SESSION['user'];
         $new_id = get_new_lot_id($link, $new_lot, $user_id);
         $path_lot_page = "Location: /lot.php?id=" . (string)$new_id;
         header($path_lot_page);
