@@ -107,6 +107,7 @@ function get_current_lot(mysqli $link, int $lot_id): ?array
        l.creation_date,
        l.id,
        l.description,
+       l.user_id,
        UNIX_TIMESTAMP(l.completion_date) - UNIX_TIMESTAMP(now()) AS timestamp_to_clos_date,
        MAX(GREATEST(COALESCE(l.price, b.bid_amount), COALESCE(b.bid_amount, l.price))) AS current_price,
        MAX(GREATEST(COALESCE(l.price, b.bid_amount), COALESCE(b.bid_amount, l.price))) + l.bid_step AS min_bid
@@ -116,7 +117,7 @@ FROM lot l
 LEFT JOIN bid b
                    ON l.id = b.lot_id
 WHERE l.id = ' . '?' .
-        ' GROUP BY l.id, l.name, l.url, l.price, l.creation_date, c.name, l.completion_date, l.bid_step, l.description';
+        ' GROUP BY l.id, l.name, l.url, l.price, l.creation_date, c.name, l.completion_date, l.bid_step, l.description, l.user_id';
 
     $stmt = db_get_prepare_stmt($link, $sql, [$lot_id]);
     return select($stmt);
@@ -279,8 +280,8 @@ WHERE id = ' . $user_id;
     return $user_name;
 }
 
-/** Функция вычисляет, нужно ли показать блок добавления ставок в этом лоте этому пользователю
- * Получает ресурс соединения, id пользователя, id лота, запрашивает в БД данные по ограничениям показа блока.
+/** Функция вычисляет, сделал ли пользователь последнюю ставку по текущему лоту
+ * Получает ресурс соединения, id пользователя, id лота.
  * На основании сопоставления с условиями показа возвращает true (показываем) или false (не показываем).
  * @param mysqli $link
  * @param int $user_id
@@ -288,24 +289,15 @@ WHERE id = ' . $user_id;
  * @return bool|null
  */
 
-function show_adding_new_bid(mysqli $link, int $user_id, int $lot_id): ?bool
+function check_last_bid_user(mysqli $link, int $user_id, int $lot_id): bool
 {
-    $sql = 'SELECT l.id,
-       l.user_id
-FROM lot l
-WHERE l.id = ' . $lot_id . ' AND l.completion_date > now() AND l.user_id != ' . $user_id;
-    $stmt = db_get_prepare_stmt($link, $sql);
-    $table_result = select($stmt);
-    if ((!isset($table_result[0])) || $table_result[0] === null) {
-        return false;
-    }
     //Определяем пользователя, сделавшего максимальную ставку.
     $sql = 'SELECT b.lot_id,
        b.bid_amount,
        b.user_id
 FROM bid b
 WHERE b.lot_id = ' . $lot_id . '
-ORDER BY b.bid_amount LIMIT 1';
+ORDER BY b.bid_amount DESC LIMIT 1';
     $stmt = db_get_prepare_stmt($link, $sql);
     $max_bit_user = select($stmt);
     $max_bit_user = $max_bit_user[0] ?? null;

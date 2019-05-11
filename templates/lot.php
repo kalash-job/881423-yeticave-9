@@ -10,7 +10,7 @@
             <p class="lot-item__description"><?= htmlspecialchars($current_lot["description"]); ?></p>
         </div>
         <div class="lot-item__right">
-            <?php if ($user_session['new_bid'] === true): ?>
+            <?php if ($new_bid_adding[0] === true): ?>
             <div class="lot-item__state">
                 <div class="lot-item__timer timer<?= color_hour_to_closing_date((int)$current_lot["timestamp_to_clos_date"]); ?>">
                     <?= time_to_closing_date((int)$current_lot["timestamp_to_clos_date"]); ?>
