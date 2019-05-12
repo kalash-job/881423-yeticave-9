@@ -15,10 +15,10 @@ if ($current_lot == null) {
 } else {
     /*Проверка условий показа блока добавления ставок*/
     if (($user_session['is_auth'] === 1) && (check_last_bid_user($link, $_SESSION['user'],
-                (int)$_GET['id']) === true) && $_SESSION['user'] !== $current_lot['user_id'] && $current_lot['timestamp_to_clos_date'] > 0) {
-        $new_bid_adding[] = true;
+                (int)$_GET['id'])) && $_SESSION['user'] !== $current_lot['user_id'] && $current_lot['timestamp_to_clos_date'] > 0) {
+        $new_bid_adding['show_block'] = true;
     } else {
-        $new_bid_adding[] = false; // ограничит показ блока добавления ставок в данном лоте для данного пользователя с открытой сессией
+        $new_bid_adding['show_block'] = false; // ограничит показ блока добавления ставок в данном лоте для данного пользователя с открытой сессией
     }
     /*Сборка шаблона страницы лота*/
     $top_menu = include_template('top-menu.php',
