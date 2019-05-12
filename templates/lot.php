@@ -10,6 +10,7 @@
             <p class="lot-item__description"><?= htmlspecialchars($current_lot["description"]); ?></p>
         </div>
         <div class="lot-item__right">
+            <?php if ($new_bid_adding['show_block'] === true): ?>
             <div class="lot-item__state">
                 <div class="lot-item__timer timer<?= color_hour_to_closing_date((int)$current_lot["timestamp_to_clos_date"]); ?>">
                     <?= time_to_closing_date((int)$current_lot["timestamp_to_clos_date"]); ?>
@@ -32,6 +33,7 @@
                     <button type="submit" class="button">Сделать ставку</button>
                 </form>
             </div>
+            <?php endif; ?>
             <div class="history">
                 <h3>История ставок (<span>10</span>)</h3>
                 <table class="history__list">

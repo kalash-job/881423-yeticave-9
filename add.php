@@ -2,6 +2,10 @@
 declare(strict_types=1);
 require_once 'init.php';
 
+if (!isset($_SESSION['user'])) {
+    header("Location: /403.php");
+    exit();
+}
 $categories = get_categories($link);
 
 $required_error_messages = [
@@ -120,7 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'categories' => $categories,
                 'errors' => $errors,
                 'new_lot' => $new_lot,
-                'form_item_error_class' => $form_item_error_class
+                'form_item_error_class' => $form_item_error_class,
+                'user_session' => $user_session
             ]);
         $layout_content = include_template('layout.php', [
             'top_menu' => $top_menu,
@@ -129,11 +134,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'new_lot' => $new_lot,
             'errors' => $errors,
             'form_item_error_class' => $form_item_error_class,
+            'user_session' => $user_session,
             'title' => 'Добавление лота'
         ]);
         print($layout_content);
     } else {
-        $user_id = 1; // временное решение до подключения аутентификации
+        $user_id = $_SESSION['user'];
         $new_id = get_new_lot_id($link, $new_lot, $user_id);
         $path_lot_page = "Location: /lot.php?id=" . (string)$new_id;
         header($path_lot_page);
@@ -143,13 +149,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $top_menu = include_template('top-menu.php',
         ['categories' => $categories]);
     $page_content = include_template('add.php',
-        ['categories' => $categories, 'errors' => $errors, 'form_item_error_class' => $form_item_error_class]);
+        [
+            'categories' => $categories,
+            'errors' => $errors,
+            'form_item_error_class' => $form_item_error_class,
+            'user_session' => $user_session
+        ]);
     $layout_content = include_template('layout.php', [
         'top_menu' => $top_menu,
         'content' => $page_content,
         'categories' => $categories,
         'errors' => $errors,
         'form_item_error_class' => $form_item_error_class,
+        'user_session' => $user_session,
         'title' => 'Добавление лота'
     ]);
     print($layout_content);

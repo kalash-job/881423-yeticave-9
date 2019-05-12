@@ -100,7 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'categories' => $categories,
                 'sign_up_errors' => $sign_up_errors,
                 'new_user' => $new_user,
-                'sign_up_form_error_class' => $sign_up_form_error_class
+                'sign_up_form_error_class' => $sign_up_form_error_class,
+                'user_session' => $user_session
             ]);
         $layout_content = include_template('layout.php', [
             'top_menu' => $top_menu,
@@ -109,6 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'sign_up_errors' => $sign_up_errors,
             'new_user' => $new_user,
             'sign_up_form_error_class' => $sign_up_form_error_class,
+            'user_session' => $user_session,
             'title' => 'Регистрация'
         ]);
         print($layout_content);
@@ -125,7 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         [
             'categories' => $categories,
             'sign_up_errors' => $sign_up_errors,
-            'sign_up_form_error_class' => $sign_up_form_error_class
+            'sign_up_form_error_class' => $sign_up_form_error_class,
+            'user_session' => $user_session
         ]);
     $layout_content = include_template('layout.php', [
         'top_menu' => $top_menu,
@@ -133,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'categories' => $categories,
         'sign_up_errors' => $sign_up_errors,
         'sign_up_form_error_class' => $sign_up_form_error_class,
+        'user_session' => $user_session,
         'title' => 'Регистрация'
     ]);
     print($layout_content);
