@@ -24,11 +24,11 @@
                         Мин. ставка <span><?= $current_lot["min_bid"]; ?> р</span>
                     </div>
                 </div>
-                <form class="lot-item__form" action="https://echo.htmlacademy.ru" method="post" autocomplete="off">
-                    <p class="lot-item__form-item form__item form__item--invalid">
+                <form class="lot-item__form" action="<?= "/lot.php?id=" . $_GET['id']; ?>" method="post" autocomplete="off">
+                    <p class="lot-item__form-item form__item<?= $new_bid_adding["form_error_class"]; ?>">
                         <label for="cost">Ваша ставка</label>
                         <input id="cost" type="text" name="cost" placeholder="<?= $current_lot["min_bid"]; ?>">
-                        <span class="form__error">Введите наименование лота</span>
+                        <span class="form__error"><?= $new_bid_adding["error_note"]; ?></span>
                     </p>
                     <button type="submit" class="button">Сделать ставку</button>
                 </form>
