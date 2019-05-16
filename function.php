@@ -410,7 +410,7 @@ function get_format_time_of_bid(array $users_bids_option): string
  * Принимает ресурс соединения и id лота.
  * Возвращает массив с данными по ставкам, либо null, если ставок не было.
  * @param mysqli $link
- * @param int $user_id
+ * @param int $lot_id
  * @return array|null
  */
 function get_list_of_lots_bids(mysqli $link, int $lot_id): ?array
