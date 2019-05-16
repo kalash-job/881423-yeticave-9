@@ -19,6 +19,24 @@ function format_cost(float $cost): string
     return $result . " <b class=\"rub\">р</b>";
 }
 
+/** Функция форматирует стоимость лота для таблицы ставок пользователя
+ * Добавляет пробел для отделения трех последних цифр, если число больше/равно 1000
+ * Добавляет сокращение р в конце стоимости лота.
+ * @param float $cost
+ * @return string
+ */
+function format_cost_for_bids(float $cost): string
+{
+    $result = "";
+    $cost = ceil($cost);
+    if ($cost >= 1000) {
+        $result = number_format($cost, 0, "", " ");
+    } else {
+        $result = $cost;
+    }
+    return $result . " р";
+}
+
 /** Функция для получения остатка времени до завершения лота
  * Принимает оставшееся время в секундах.
  * Возвращает строку формата ЧЧ:ММ.
@@ -305,4 +323,110 @@ ORDER BY b.bid_amount DESC LIMIT 1';
         return false;
     }
     return true;
+}
+
+function add_new_bid(mysqli $link, array $new_bid)
+{
+    $sql = 'INSERT INTO bid
+(bid_amount, user_id, lot_id)
+VALUES (?, ?, ?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [
+        $new_bid['cost'],
+        $new_bid['user_id'],
+        $new_bid['lot_id']
+    ]);
+    insert($stmt);
+    return;
+}
+
+/** Функция формирует запросы к БД для получения данных для формирования таблицы ставок пользователя.
+ * Принимает ресурс соединения и id пользователя.
+ * Возвращает массив с данными по ставкам, либо null, если ставок не было.
+ * @param mysqli $link
+ * @param int $user_id
+ * @return array|null
+ */
+function get_list_of_users_bids(mysqli $link, int $user_id): ?array
+{
+    $sql = 'SELECT l.name,
+       l.url,
+       c.name                                                                          AS category,
+       UNIX_TIMESTAMP(l.completion_date) - UNIX_TIMESTAMP(now()) AS timestamp_to_clos_date,
+       l.winner_id,
+       b.user_id,
+       b.bid_amount,
+       b.lot_id,
+       b.date,
+       UNIX_TIMESTAMP(b.date)  AS timestamp_bid,
+       TIME_FORMAT(b.date, "%H:%i") AS time_of_bid,
+       DATE_FORMAT(b.date, "%d.%m.%y в %H:%i") AS date_time_of_bid,
+       TIMEDIFF (l.completion_date, now()) AS time_to_clos_date,
+       u.contact
+FROM bid b
+LEFT JOIN lot l
+                   ON b.lot_id = l.id
+LEFT JOIN category c
+                   ON l.category_id = c.id
+LEFT JOIN user u
+                   ON l.winner_id = u.id
+WHERE b.user_id = ' . $user_id .
+        ' ORDER BY b.date DESC';
+    $stmt = db_get_prepare_stmt($link, $sql);
+    return select($stmt);
+}
+
+/** Функция возвращает различные форматы записи времени и даты для столбца "Время ставки"
+ * @param array $users_bids_option
+ * @return string
+ */
+function get_format_time_of_bid(array $users_bids_option): string
+{
+    $hours_ago = (int)((time() - ((int)$users_bids_option["timestamp_bid"])) / 3600); //округленное до целого количество часов, прошедшее с момента ставки
+    $minuts_ago = (int)((time() - (int)$users_bids_option["timestamp_bid"]) / 60) - $hours_ago * 60; //округленное до целого количество минут, прошедшше с момента ставки (за вычетом часов)
+    /*для ставок, сделанных менее часа назад*/
+    if ((int)$users_bids_option["timestamp_bid"] > strtotime("1 hour ago")) {
+        $date_time_of_bid = $minuts_ago . get_noun_plural_form($minuts_ago,
+                ' минута', ' минуты', ' минут') . ' назад';
+        /* для ставок, сделанных более 1 часа, но менее 2 часов назад */
+    } elseif ((int)$users_bids_option["timestamp_bid"] > strtotime("2 hour ago") && (int)$users_bids_option["timestamp_bid"] > strtotime("today midnight")) {
+        $date_time_of_bid = 'Час назад';
+        /* для ставок, сделанных более 2 часов назад, но сегодня  */
+    } elseif
+    ((int)$users_bids_option["timestamp_bid"] > strtotime("today midnight")) {
+        $date_time_of_bid = $hours_ago . get_noun_plural_form($hours_ago,
+                ' час ', ' часа ', ' часов ') . ' назад';
+        /* для ставок, сделанных вчера */
+    } elseif
+    ((int)$users_bids_option["timestamp_bid"] > strtotime("yesterday midnight")) {
+        $date_time_of_bid = "Вчера, в " . $users_bids_option["time_of_bid"];
+        /* для остальных ставок */
+    } else {
+        $date_time_of_bid = $users_bids_option["date_time_of_bid"];
+    }
+    return $date_time_of_bid;
+}
+
+/** Функция формирует запросы к БД для получения данных для формирования таблицы истории ставок по лоту.
+ * Принимает ресурс соединения и id лота.
+ * Возвращает массив с данными по ставкам, либо null, если ставок не было.
+ * @param mysqli $link
+ * @param int $lot_id
+ * @return array|null
+ */
+function get_list_of_lots_bids(mysqli $link, int $lot_id): ?array
+{
+    $sql = 'SELECT u.name,
+       b.bid_amount,
+       b.date,
+       UNIX_TIMESTAMP(b.date)  AS timestamp_bid,
+       TIME_FORMAT(b.date, "%H:%i") AS time_of_bid,
+       DATE_FORMAT(b.date, "%d.%m.%y в %H:%i") AS date_time_of_bid,
+       (SELECT COUNT(b.id) FROM bid b WHERE b.lot_id = ' . $lot_id .') AS count_of_bids
+FROM bid b
+LEFT JOIN user u
+                   ON b.user_id = u.id
+WHERE b.lot_id = ' . $lot_id .
+        ' ORDER BY b.date DESC';
+    $stmt = db_get_prepare_stmt($link, $sql);
+    return select($stmt);
 }

@@ -24,69 +24,28 @@
                         Мин. ставка <span><?= $current_lot["min_bid"]; ?> р</span>
                     </div>
                 </div>
-                <form class="lot-item__form" action="https://echo.htmlacademy.ru" method="post" autocomplete="off">
-                    <p class="lot-item__form-item form__item form__item--invalid">
+                <form class="lot-item__form" action="<?= "/lot.php?id=" . $_GET['id']; ?>" method="post" autocomplete="off">
+                    <p class="lot-item__form-item form__item<?= $new_bid_adding["form_error_class"]; ?>">
                         <label for="cost">Ваша ставка</label>
                         <input id="cost" type="text" name="cost" placeholder="<?= $current_lot["min_bid"]; ?>">
-                        <span class="form__error">Введите наименование лота</span>
+                        <span class="form__error"><?= $new_bid_adding["error_note"]; ?></span>
                     </p>
                     <button type="submit" class="button">Сделать ставку</button>
                 </form>
             </div>
             <?php endif; ?>
             <div class="history">
-                <h3>История ставок (<span>10</span>)</h3>
+                <?php $value = isset($bids_by_lot[0]["count_of_bids"]) ? $bids_by_lot[0]["count_of_bids"] : 0; ?>
+                <h3>История ставок (<span><?= $value; ?></span>)</h3>
                 <table class="history__list">
+                    <?php foreach ($bids_by_lot as $lots_bids_option): ?>
+                        <?php $time_of_bid = get_format_time_of_bid($lots_bids_option); ?>
                     <tr class="history__item">
-                        <td class="history__name">Иван</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">5 минут назад</td>
+                        <td class="history__name"><?= $lots_bids_option['name']; ?></td>
+                        <td class="history__price"><?= format_cost_for_bids($lots_bids_option['bid_amount']); ?></td>
+                        <td class="history__time"><?= $time_of_bid; ?></td>
                     </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Константин</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">20 минут назад</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Евгений</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">Час назад</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Игорь</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">19.03.17 в 08:21</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Енакентий</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">19.03.17 в 13:20</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Семён</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">19.03.17 в 12:20</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Илья</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">19.03.17 в 10:20</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Енакентий</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">19.03.17 в 13:20</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Семён</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">19.03.17 в 12:20</td>
-                    </tr>
-                    <tr class="history__item">
-                        <td class="history__name">Илья</td>
-                        <td class="history__price">10 999 р</td>
-                        <td class="history__time">19.03.17 в 10:20</td>
-                    </tr>
+                    <?php endforeach ?>
                 </table>
             </div>
         </div>
