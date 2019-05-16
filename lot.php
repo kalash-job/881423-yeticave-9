@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+$bids_by_lot = get_list_of_lots_bids($link, (int)$_GET['id']);
 /*Сборка шаблона страницы лота*/
 $top_menu = include_template('top-menu.php',
     ['categories' => $categories]);
@@ -55,6 +56,7 @@ $page_content = include_template('lot.php',
         'current_lot' => $current_lot,
         'categories' => $categories,
         'user_session' => $user_session,
+        'bids_by_lot' => $bids_by_lot,
         'new_bid_adding' => $new_bid_adding
     ]);
 $layout_content = include_template('layout.php', [
@@ -63,6 +65,7 @@ $layout_content = include_template('layout.php', [
     'categories' => $categories,
     'user_session' => $user_session,
     'new_bid_adding' => $new_bid_adding,
+    'bids_by_lot' => $bids_by_lot,
     'title' => $current_lot['name']
 ]);
 print($layout_content);
