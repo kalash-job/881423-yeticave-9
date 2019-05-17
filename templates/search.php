@@ -1,6 +1,6 @@
 <div class="container">
     <section class="lots">
-        <h2>Результаты поиска по запросу «<span><?= trim($search); ?></span>»</h2>
+        <h2>Результаты поиска по запросу «<span><?= htmlspecialchars(trim($search)); ?></span>»</h2>
         <?php if ($items !== null): ?>
             <ul class="lots__list">
                 <?php foreach ($items as $value): ?>

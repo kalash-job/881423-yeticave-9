@@ -430,6 +430,14 @@ WHERE b.lot_id = ' . $lot_id .
     return select($stmt);
 }
 
+/** Функция осуществляет запросы к БД для полнотекстового поиска с учетом поискового запроса $search.
+ *  $page_items, $offset определяют количество возвращаемых лотов с учетом построения пагинации.
+ * @param mysqli $link
+ * @param string $search
+ * @param $page_items
+ * @param $offset
+ * @return array|null
+ */
 function get_search_result(mysqli $link, string $search, $page_items, $offset): ?array
 {
     $sql = 'SELECT l.name,
@@ -454,6 +462,11 @@ LIMIT ' . $page_items . ' OFFSET ' . $offset;
     }
 }
 
+/** Функция для определения количества лотов, которые выводятся в результатах поиска по поисковому запросу $search.
+ * @param mysqli $link
+ * @param string $search
+ * @return array|null
+ */
 function get_search_num(mysqli $link, string $search): ?array
 {
     $sql = 'SELECT COUNT(l.id) AS result_num
