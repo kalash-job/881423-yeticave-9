@@ -2,7 +2,7 @@
     <h2>Мои ставки</h2>
     <table class="rates__list">
         <?php foreach ($users_bids as $users_bids_option): ?>
-        <!--подготовка классов и подписей для форматирования столбца Время до окончания лота-->
+            <!--подготовка классов и подписей для форматирования столбца Время до окончания лота-->
             <?php if (isset($users_bids_option['winner_id']) && $users_bids_option['winner_id'] === $users_bids_option['user_id']) {
                 $value = ' rates__item--win';
                 $contacts = '<p>' . $users_bids_option['contact'] . '</p>';

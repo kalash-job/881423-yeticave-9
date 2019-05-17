@@ -14,6 +14,7 @@ $layout_content = include_template('layout.php', [
     'content' => $page_content,
     'categories' => $categories,
     'user_session' => $user_session,
+    'pagination' => '',
     'title' => '403 Доступ к странице запрещен'
 ]);
 print($layout_content);

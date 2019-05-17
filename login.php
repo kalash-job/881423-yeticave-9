@@ -80,6 +80,7 @@ $layout_content = include_template('layout.php', [
     'form_login_error_class' => $form_login_error_class,
     'login_form' => $login_form,
     'user_session' => $user_session,
+    'pagination' => '',
     'title' => 'Вход'
 ]);
 print($layout_content);
