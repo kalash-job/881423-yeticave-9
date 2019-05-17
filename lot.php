@@ -66,6 +66,7 @@ $layout_content = include_template('layout.php', [
     'user_session' => $user_session,
     'new_bid_adding' => $new_bid_adding,
     'bids_by_lot' => $bids_by_lot,
+    'pagination' => '',
     'title' => $current_lot['name']
 ]);
 print($layout_content);

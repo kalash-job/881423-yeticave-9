@@ -23,6 +23,7 @@ $layout_content = include_template('layout.php', [
     'categories' => $categories,
     'users_bids' => $users_bids,
     'user_session' => $user_session,
+    'pagination' => '',
     'title' => 'Мои ставки'
 ]);
 print($layout_content);

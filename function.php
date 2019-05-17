@@ -420,13 +420,45 @@ function get_list_of_lots_bids(mysqli $link, int $lot_id): ?array
        b.date,
        UNIX_TIMESTAMP(b.date)  AS timestamp_bid,
        TIME_FORMAT(b.date, "%H:%i") AS time_of_bid,
-       DATE_FORMAT(b.date, "%d.%m.%y в %H:%i") AS date_time_of_bid,
-       (SELECT COUNT(b.id) FROM bid b WHERE b.lot_id = ' . $lot_id .') AS count_of_bids
+       DATE_FORMAT(b.date, "%d.%m.%y в %H:%i") AS date_time_of_bid
 FROM bid b
 LEFT JOIN user u
                    ON b.user_id = u.id
 WHERE b.lot_id = ' . $lot_id .
         ' ORDER BY b.date DESC';
     $stmt = db_get_prepare_stmt($link, $sql);
+    return select($stmt);
+}
+
+function get_search_result(mysqli $link, string $search, $page_items, $offset): ?array
+{
+    $sql = 'SELECT l.name,
+       l.price,
+       l.url,
+       c.name                                                                          AS category,
+       l.creation_date,
+       l.id,
+       UNIX_TIMESTAMP(l.completion_date) - UNIX_TIMESTAMP(now()) AS timestamp_to_clos_date
+FROM lot l
+         LEFT JOIN category c
+                   ON l.category_id = c.id
+WHERE l.completion_date > now() AND MATCH(l.name, l.description) AGAINST(?)
+ORDER BY l.creation_date DESC
+LIMIT ' . $page_items . ' OFFSET ' . $offset;
+    $stmt = db_get_prepare_stmt($link, $sql, [$search]);
+    $result = select($stmt);
+    if (isset($result[0])) {
+        return $result;
+    } else {
+        return null;
+    }
+}
+
+function get_search_num(mysqli $link, string $search): ?array
+{
+    $sql = 'SELECT COUNT(l.id) AS result_num
+FROM lot l
+WHERE l.completion_date > now() AND MATCH(l.name, l.description) AGAINST(?)';
+    $stmt = db_get_prepare_stmt($link, $sql, [$search]);
     return select($stmt);
 }

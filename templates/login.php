@@ -1,4 +1,5 @@
-<form class="form container<?= $form_login_error_class['login_form']; ?>" action="/login.php" method="post"> <!-- form--invalid -->
+<form class="form container<?= $form_login_error_class['login_form']; ?>" action="/login.php" method="post">
+    <!-- form--invalid -->
     <h2>Вход</h2>
     <div class="form__item<?= $form_login_error_class['email']; ?>"> <!-- form__item--invalid -->
         <label for="email">E-mail <sup>*</sup></label>

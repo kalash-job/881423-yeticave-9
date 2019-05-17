@@ -111,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'new_user' => $new_user,
             'sign_up_form_error_class' => $sign_up_form_error_class,
             'user_session' => $user_session,
+            'pagination' => '',
             'title' => 'Регистрация'
         ]);
         print($layout_content);
@@ -137,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'sign_up_errors' => $sign_up_errors,
         'sign_up_form_error_class' => $sign_up_form_error_class,
         'user_session' => $user_session,
+        'pagination' => '',
         'title' => 'Регистрация'
     ]);
     print($layout_content);
