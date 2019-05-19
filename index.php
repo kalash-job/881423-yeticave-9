@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once 'init.php';
+require_once 'getwinner.php';
 
 $categories = get_categories($link);
 $items = get_items($link);
