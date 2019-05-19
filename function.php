@@ -538,3 +538,66 @@ WHERE l.id = ' . $lot_id . ' AND u.id = ' . $user_id;
     $email_data = $email_data[0] ?? null;
     return $email_data;
 }
+
+/** Функция для определения количества действующих лотов, которые выводятся в категории $category_id.
+ * @param mysqli $link
+ * @param string $search
+ * @return array|null
+ */
+function get_lots_count(mysqli $link, int $category_id): ?array
+{
+    $sql = 'SELECT COUNT(l.id) AS result_num
+FROM lot l
+WHERE l.completion_date > now() AND category_id = ' . $category_id;
+    $stmt = db_get_prepare_stmt($link, $sql);
+    return select($stmt);
+}
+
+/** Функция осуществляет запросы к БД для построения каталога лотов по категории $category_id.
+ *  $page_items, $offset определяют количество возвращаемых лотов с учетом построения пагинации.
+ * @param mysqli $link
+ * @param string $search
+ * @param $page_items
+ * @param $offset
+ * @return array|null
+ */
+function get_lots_by_category(mysqli $link, int $category_id, $page_items, $offset): ?array
+{
+    $sql = 'SELECT l.name,
+       l.price,
+       l.url,
+       c.name                                                                          AS category,
+       l.creation_date,
+       l.id,
+       UNIX_TIMESTAMP(l.completion_date) - UNIX_TIMESTAMP(now()) AS timestamp_to_clos_date
+FROM lot l
+         LEFT JOIN category c
+                   ON l.category_id = c.id
+WHERE l.completion_date > now() AND l.category_id = ' . $category_id . '
+ORDER BY l.creation_date DESC
+LIMIT ' . $page_items . ' OFFSET ' . $offset;
+    $stmt = db_get_prepare_stmt($link, $sql);
+    $result = select($stmt);
+    if (isset($result[0])) {
+        return $result;
+    } else {
+        return null;
+    }
+}
+
+/** Функция для получения названия категории в строковом значении с id=$category_id.
+ * При отсутствии категории с таким id, возвращает null
+ * @param mysqli $link
+ * @param string $search
+ * @return array|null
+ */
+function get_category_name(mysqli $link, int $category_id): ?string
+{
+    $sql = 'SELECT name
+FROM category
+WHERE id = ' . $category_id;
+    $stmt = db_get_prepare_stmt($link, $sql);
+    $result = select($stmt);
+    $result = $result[0]['name'] ?? null;
+    return $result;
+}

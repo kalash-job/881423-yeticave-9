@@ -17,7 +17,6 @@ if (trim($search) !== '') {
     $part_of_path = "search.php?search=" . $search . "&";
 } else {
     $pages_count = null;
-    $search_result_num = null;
     $pages = null;
     $current_page = null;
     $items = null;
@@ -29,7 +28,6 @@ $pagination = include_template('pagination.php',
     [
         'pages_count' => $pages_count,
         'current_page' => $current_page,
-        'search' => $search,
         'pages' => $pages,
         'part_of_path' => $part_of_path
     ]);
