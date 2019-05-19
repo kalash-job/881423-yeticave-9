@@ -10,4 +10,4 @@
                     href="/<?= $part_of_path; ?>page=<?= $current_page + 1; ?><?php endif; ?>">Вперед</a></li>
     </ul>
 <?php endif; ?>
-<?php if (isset($_GET['search'])): ?></div><?php endif; ?>
+</div>

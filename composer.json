@@ -1,0 +1,13 @@
+{
+    "name": "htmlacademy/yeticave",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Nikolay Kalashnikov",
+            "email": "kalash-job@yandex.ru"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.2"
+    }
+}
