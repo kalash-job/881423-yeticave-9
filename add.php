@@ -30,7 +30,7 @@ $format_error_messages = [
     'category' => 'Выберите категорию',
     'lot_rate' => 'В это поле нужно ввести число больше нуля',
     'lot_step' => 'В это поле нужно ввести число больше нуля',
-    'lot_date' => 'Дату нужно ввести в формате ГГГГ-ММ-ДД'
+    'lot_date' => 'Дату нужно ввести, начиная с завтрашней, в формате ГГГГ-ММ-ДД'
 ];
 
 $form_item_error_class = [
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $errors[$key] = $format_error_messages[$key];
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
-        } elseif ($key === "lot_date" && is_date_valid((string)$_POST[$key]) === false) {
+        } elseif ($key === "lot_date" && (is_date_valid((string)$_POST[$key]) === false || is_date_after_today((string)$_POST[$key]) === false)) {
             $errors[$key] = $format_error_messages[$key];
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
@@ -98,13 +98,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $errors['lot_image'] = 'Загрузите изображение лота в правильном формате (png или jpeg)';
             $form_item_error_class['lot_image'] = $error_class;
             $num_errors += 1;
-        } else {
-            /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
-            if ($file_type === "image/jpeg") {
-                $path = uniqid() . ".jpg";
-            } else {
-                $path = uniqid() . ".png";
-            }
+        }
+        /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
+        if ($file_type === "image/jpeg" && $num_errors === 0) {
+            $path = uniqid() . ".jpg";
+            move_uploaded_file($tmp_name, 'uploads/' . $path);
+            $new_lot['path'] = $path;
+        } elseif ($num_errors === 0) {
+            $path = uniqid() . ".png";
             move_uploaded_file($tmp_name, 'uploads/' . $path);
             $new_lot['path'] = $path;
         }

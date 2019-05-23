@@ -21,14 +21,16 @@
                             <span class="lot-item__cost"><?= format_cost_for_bids_block(htmlspecialchars($current_lot["current_price"])); ?></span>
                         </div>
                         <div class="lot-item__min-cost">
-                            Мин. ставка <span><?= format_cost_for_bids_block(htmlspecialchars($current_lot["min_bid"])); ?> р</span>
+                            Мин. ставка
+                            <span><?= format_cost_for_bids_block(htmlspecialchars($current_lot["min_bid"])); ?> р</span>
                         </div>
                     </div>
                     <form class="lot-item__form" action="<?= "/lot.php?id=" . $_GET['id']; ?>" method="post"
                           autocomplete="off">
                         <p class="lot-item__form-item form__item<?= $new_bid_adding["form_error_class"]; ?>">
                             <label for="cost">Ваша ставка</label>
-                            <input id="cost" type="text" name="cost" placeholder="<?= format_cost_for_bids_block(htmlspecialchars($current_lot["min_bid"])); ?>">
+                            <input id="cost" type="text" name="cost"
+                                   placeholder="<?= format_cost_for_bids_block(htmlspecialchars($current_lot["min_bid"])); ?>">
                             <span class="form__error"><?= $new_bid_adding["error_note"]; ?></span>
                         </p>
                         <button type="submit" class="button">Сделать ставку</button>

@@ -51,7 +51,7 @@ function format_cost_for_bids_block(float $cost): string
     } else {
         $result = $cost;
     }
-    return (string) $result;
+    return (string)$result;
 }
 
 /** Функция для получения остатка времени до завершения лота
@@ -246,7 +246,7 @@ function check_unique_email(mysqli $link, string $email): ?bool
     $sql = 'SELECT u.id
 FROM user u
 WHERE u.email = ?';
-    $stmt = db_get_prepare_stmt($link, $sql,[$email]);
+    $stmt = db_get_prepare_stmt($link, $sql, [$email]);
     $current_user_id = select($stmt, $link);
     if (!isset($current_user_id[0])) {
         return true;
@@ -617,4 +617,17 @@ WHERE id = ?';
     $result = select($stmt, $link);
     $result = $result[0]['name'] ?? null;
     return $result;
+}
+
+/** Функция для проверки того, что дата завершения лота в формате ГГГГ-ММ-ДД больше текущей даты хотя бы на день
+ * @param string $date
+ * @return bool
+ */
+function is_date_after_today(string $date): bool
+{
+    $date = strtotime($date);
+    if ($date >= strtotime("tomorrow midnight")) {
+        return true;
+    }
+    return false;
 }
