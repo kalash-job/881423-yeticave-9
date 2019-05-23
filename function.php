@@ -81,7 +81,7 @@ function get_categories(mysqli $link): array
 {
     $sql = "SELECT id, name, css_class FROM category";
     $stmt = db_get_prepare_stmt($link, $sql);
-    return select($stmt);
+    return select($stmt, $link);
 }
 
 /** Функция для получения $items.
@@ -106,7 +106,7 @@ WHERE l.completion_date > now()
 ORDER BY l.creation_date DESC
 LIMIT 9';
     $stmt = db_get_prepare_stmt($link, $sql);
-    return select($stmt);
+    return select($stmt, $link);
 }
 
 /** Функция для получения массива $current_lot.
@@ -134,11 +134,11 @@ FROM lot l
                    ON l.category_id = c.id
 LEFT JOIN bid b
                    ON l.id = b.lot_id
-WHERE l.id = ' . '?' .
-        ' GROUP BY l.id, l.name, l.url, l.price, l.creation_date, c.name, l.completion_date, l.bid_step, l.description, l.user_id';
+WHERE l.id = ?
+GROUP BY l.id, l.name, l.url, l.price, l.creation_date, c.name, l.completion_date, l.bid_step, l.description, l.user_id';
 
     $stmt = db_get_prepare_stmt($link, $sql, [$lot_id]);
-    return select($stmt);
+    return select($stmt, $link);
 }
 
 /** Функция для работы с подготовленным выражением с параметрами при SELECT-запросах
@@ -146,7 +146,7 @@ WHERE l.id = ' . '?' .
  * @param mysqli_stmt $stmt
  * @return array|null
  */
-function select(mysqli_stmt $stmt): ?array
+function select(mysqli_stmt $stmt, mysqli $link): ?array
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -186,7 +186,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         $new_lot['category'],
         $user_id
     ]);
-    $new_id = insert($stmt);
+    $new_id = insert($stmt, $link);
     if ($new_id !== null) {
         /*возвращаем id добавленной записи*/
         return $new_id;
@@ -202,7 +202,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
  * @param mysqli_stmt $stmt
  * @return int|null
  */
-function insert(mysqli_stmt $stmt): ?int
+function insert(mysqli_stmt $stmt, mysqli $link): ?int
 {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_affected_rows($stmt);
@@ -228,9 +228,9 @@ function check_unique_email(mysqli $link, string $email): ?bool
 {
     $sql = 'SELECT u.id
 FROM user u
-WHERE u.email = "' . $email . '"';
-    $stmt = db_get_prepare_stmt($link, $sql);
-    $current_user_id = select($stmt);
+WHERE u.email = ?';
+    $stmt = db_get_prepare_stmt($link, $sql,[$email]);
+    $current_user_id = select($stmt, $link);
     if (!isset($current_user_id[0])) {
         return true;
     } else {
@@ -263,7 +263,7 @@ VALUES (?, ?, ?, ?, ?)';
         $new_user['name'],
         $new_user['message']
     ]);
-    insert($stmt);
+    insert($stmt, $link);
     return;
 }
 
@@ -280,7 +280,7 @@ function get_user_data(mysqli $link, string $email): ?array
 FROM user u
 WHERE u.email = ?';
     $stmt = db_get_prepare_stmt($link, $sql, [$email]);
-    return select($stmt);
+    return select($stmt, $link);
 }
 
 /** Функция возвращает имя пользователя по его id
@@ -291,9 +291,9 @@ WHERE u.email = ?';
 function get_username(mysqli $link, int $user_id): ?array
 {
     $sql = 'SELECT name FROM user
-WHERE id = ' . $user_id;
-    $stmt = db_get_prepare_stmt($link, $sql);
-    $user_name = select($stmt);
+WHERE id = ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$user_id]);
+    $user_name = select($stmt, $link);
     $user_name = $user_name[0] ?? null;
     return $user_name;
 }
@@ -314,10 +314,10 @@ function check_last_bid_user(mysqli $link, int $user_id, int $lot_id): bool
        b.bid_amount,
        b.user_id
 FROM bid b
-WHERE b.lot_id = ' . $lot_id . '
+WHERE b.lot_id = ?
 ORDER BY b.bid_amount DESC LIMIT 1';
-    $stmt = db_get_prepare_stmt($link, $sql);
-    $max_bit_user = select($stmt);
+    $stmt = db_get_prepare_stmt($link, $sql, [$lot_id]);
+    $max_bit_user = select($stmt, $link);
     $max_bit_user = $max_bit_user[0] ?? null;
     if ((int)$max_bit_user['user_id'] === $user_id) {
         return false;
@@ -335,7 +335,7 @@ VALUES (?, ?, ?)';
         $new_bid['user_id'],
         $new_bid['lot_id']
     ]);
-    insert($stmt);
+    insert($stmt, $link);
     return;
 }
 
@@ -369,10 +369,10 @@ LEFT JOIN category c
                    ON l.category_id = c.id
 LEFT JOIN user u
                    ON l.winner_id = u.id
-WHERE b.user_id = ' . $user_id .
-        ' ORDER BY b.date DESC';
-    $stmt = db_get_prepare_stmt($link, $sql);
-    return select($stmt);
+WHERE b.user_id = ?
+ORDER BY b.date DESC';
+    $stmt = db_get_prepare_stmt($link, $sql, [$user_id]);
+    return select($stmt, $link);
 }
 
 /** Функция возвращает различные форматы записи времени и даты для столбца "Время ставки"
@@ -424,10 +424,10 @@ function get_list_of_lots_bids(mysqli $link, int $lot_id): ?array
 FROM bid b
 LEFT JOIN user u
                    ON b.user_id = u.id
-WHERE b.lot_id = ' . $lot_id .
-        ' ORDER BY b.date DESC';
-    $stmt = db_get_prepare_stmt($link, $sql);
-    return select($stmt);
+WHERE b.lot_id = ?
+ORDER BY b.date DESC';
+    $stmt = db_get_prepare_stmt($link, $sql, [$lot_id]);
+    return select($stmt, $link);
 }
 
 /** Функция осуществляет запросы к БД для полнотекстового поиска с учетом поискового запроса $search.
@@ -452,9 +452,9 @@ FROM lot l
                    ON l.category_id = c.id
 WHERE l.completion_date > now() AND MATCH(l.name, l.description) AGAINST(?)
 ORDER BY l.creation_date DESC
-LIMIT ' . $page_items . ' OFFSET ' . $offset;
-    $stmt = db_get_prepare_stmt($link, $sql, [$search]);
-    $result = select($stmt);
+LIMIT ? OFFSET ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$search, $page_items, $offset]);
+    $result = select($stmt, $link);
     if (isset($result[0])) {
         return $result;
     } else {
@@ -473,7 +473,7 @@ function get_search_num(mysqli $link, string $search): ?array
 FROM lot l
 WHERE l.completion_date > now() AND MATCH(l.name, l.description) AGAINST(?)';
     $stmt = db_get_prepare_stmt($link, $sql, [$search]);
-    return select($stmt);
+    return select($stmt, $link);
 }
 
 /** Функция определяет победившие ставки и id пользователей-победителей по завершившимся лотам
@@ -497,7 +497,7 @@ FROM (SELECT  b.lot_id,
 LEFT JOIN bid b 
     ON lot_and_winner_bid.winner_bid_id = b.id';
     $stmt = db_get_prepare_stmt($link, $sql);
-    return select($stmt);
+    return select($stmt, $link);
 }
 
 /** Функция добавляет winner_id в таблицу лота.
@@ -510,10 +510,10 @@ LEFT JOIN bid b
 function add_winners(mysqli $link, int $lot_id, int $user_id)
 {
     $sql = 'UPDATE lot
-SET winner_id = ' . $user_id . '
-WHERE id = ' . $lot_id;
-    $stmt = db_get_prepare_stmt($link, $sql);
-    insert($stmt);
+SET winner_id = ?
+WHERE id = ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$user_id, $lot_id]);
+    insert($stmt, $link);
     return;
 }
 
@@ -532,9 +532,9 @@ function get_data_for_email(mysqli $link, int $lot_id, int $user_id): array
 FROM lot l
          LEFT JOIN user u
                    ON l.winner_id = u.id
-WHERE l.id = ' . $lot_id . ' AND u.id = ' . $user_id;
-    $stmt = db_get_prepare_stmt($link, $sql);
-    $email_data = select($stmt);
+WHERE l.id = ? AND u.id = ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$lot_id, $user_id]);
+    $email_data = select($stmt, $link);
     $email_data = $email_data[0] ?? null;
     return $email_data;
 }
@@ -548,9 +548,9 @@ function get_lots_count(mysqli $link, int $category_id): ?array
 {
     $sql = 'SELECT COUNT(l.id) AS result_num
 FROM lot l
-WHERE l.completion_date > now() AND category_id = ' . $category_id;
-    $stmt = db_get_prepare_stmt($link, $sql);
-    return select($stmt);
+WHERE l.completion_date > now() AND category_id = ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$category_id]);
+    return select($stmt, $link);
 }
 
 /** Функция осуществляет запросы к БД для построения каталога лотов по категории $category_id.
@@ -573,11 +573,11 @@ function get_lots_by_category(mysqli $link, int $category_id, $page_items, $offs
 FROM lot l
          LEFT JOIN category c
                    ON l.category_id = c.id
-WHERE l.completion_date > now() AND l.category_id = ' . $category_id . '
+WHERE l.completion_date > now() AND l.category_id = ?
 ORDER BY l.creation_date DESC
-LIMIT ' . $page_items . ' OFFSET ' . $offset;
-    $stmt = db_get_prepare_stmt($link, $sql);
-    $result = select($stmt);
+LIMIT ? OFFSET ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$category_id, $page_items, $offset]);
+    $result = select($stmt, $link);
     if (isset($result[0])) {
         return $result;
     } else {
@@ -595,9 +595,9 @@ function get_category_name(mysqli $link, int $category_id): ?string
 {
     $sql = 'SELECT name
 FROM category
-WHERE id = ' . $category_id;
-    $stmt = db_get_prepare_stmt($link, $sql);
-    $result = select($stmt);
+WHERE id = ?';
+    $stmt = db_get_prepare_stmt($link, $sql, [$category_id]);
+    $result = select($stmt, $link);
     $result = $result[0]['name'] ?? null;
     return $result;
 }

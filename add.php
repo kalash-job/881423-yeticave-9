@@ -135,6 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'errors' => $errors,
             'form_item_error_class' => $form_item_error_class,
             'user_session' => $user_session,
+            'pagination' => '',
             'title' => 'Добавление лота'
         ]);
         print($layout_content);
