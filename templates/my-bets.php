@@ -26,13 +26,13 @@
                 <td class="rates__info">
                     <div class="rates__img">
                         <img src="../<?= $users_bids_option['url']; ?>" width="54" height="40"
-                             alt="<?= $users_bids_option['name']; ?>">
+                             alt="<?= htmlspecialchars($users_bids_option['name']); ?>">
                     </div>
                     <div>
                         <h3 class="rates__title"><a
-                                    href="lot.php?id=<?= $users_bids_option['lot_id']; ?>"><?= $users_bids_option['name']; ?></a>
+                                    href="lot.php?id=<?= $users_bids_option['lot_id']; ?>"><?= htmlspecialchars($users_bids_option['name']); ?></a>
                         </h3>
-                        <?= $contacts; ?>
+                        <?= htmlspecialchars($contacts); ?>
                     </div>
                 </td>
                 <td class="rates__category">
@@ -42,7 +42,7 @@
                     <div class="timer<?= $class_timer; ?>"><?= $note_timer; ?></div>
                 </td>
                 <td class="rates__price">
-                    <?= format_cost_for_bids($users_bids_option["bid_amount"]); ?>
+                    <?= format_cost_for_bids(htmlspecialchars($users_bids_option["bid_amount"])); ?>
                 </td>
                 <td class="rates__time">
                     <?= $time_of_bid; ?>

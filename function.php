@@ -37,6 +37,23 @@ function format_cost_for_bids(float $cost): string
     return $result . " р";
 }
 
+/** Функция форматирует стоимость лота для блока ставок на странице лота
+ * Добавляет пробел для отделения трех последних цифр, если число больше/равно 1000
+ * @param float $cost
+ * @return string
+ */
+function format_cost_for_bids_block(float $cost): string
+{
+    $result = "";
+    $cost = ceil($cost);
+    if ($cost >= 1000) {
+        $result = number_format($cost, 0, "", " ");
+    } else {
+        $result = $cost;
+    }
+    return (string) $result;
+}
+
 /** Функция для получения остатка времени до завершения лота
  * Принимает оставшееся время в секундах.
  * Возвращает строку формата ЧЧ:ММ.
