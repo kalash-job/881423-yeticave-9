@@ -78,16 +78,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $sign_up_errors['avatar'] = $sign_up_format_error_messages['avatar'];
             $sign_up_form_error_class['avatar'] = $sign_up_error_class;
             $sign_up_num_errors += 1;
-        } else {
-            /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
-            if ($file_type === "image/jpeg") {
-                $path = uniqid() . ".jpg";
-            } else {
-                $path = uniqid() . ".png";
-            }
-            move_uploaded_file($tmp_name, 'uploads/' . $path);
-            $new_user['path'] = $path;
         }
+        /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
+        if ($file_type === "image/jpeg" && $sign_up_num_errors === 0) {
+            $path = uniqid() . ".jpg";
+        } elseif ($sign_up_num_errors === 0) {
+            $path = uniqid() . ".png";
+        }
+        move_uploaded_file($tmp_name, 'uploads/' . $path);
+        $new_user['path'] = $path;
+
     }
     if ($sign_up_num_errors !== 0) {
         /*Подключаем шаблон страницы регистрации пользователя с формой,

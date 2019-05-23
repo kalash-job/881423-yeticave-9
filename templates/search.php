@@ -16,7 +16,7 @@
                             <div class="lot__state">
                                 <div class="lot__rate">
                                     <span class="lot__amount">Стартовая цена</span>
-                                    <span class="lot__cost"><?= format_cost($value["price"]); ?></span>
+                                    <span class="lot__cost"><?= format_cost(htmlspecialchars($value["price"])); ?></span>
                                 </div>
                                 <div class="lot__timer timer<?= color_hour_to_closing_date((int)$value["timestamp_to_clos_date"]); ?>">
                                     <?= time_to_closing_date((int)$value["timestamp_to_clos_date"]); ?>

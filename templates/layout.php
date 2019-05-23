@@ -24,7 +24,7 @@
             <nav class="user-menu">
                 <?php if ($user_session['is_auth'] === 1): ?>
                     <div class="user-menu__logged">
-                        <p><?= $user_session['name']; ?></p>
+                        <p><?= htmlspecialchars($user_session['name']); ?></p>
                         <a class="user-menu__bets" href="/my-bets.php">Мои ставки</a>
                         <a class="user-menu__logout" href="/logout.php">Выход</a>
                     </div>
