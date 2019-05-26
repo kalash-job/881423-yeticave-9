@@ -28,9 +28,11 @@ $lot_fields = [
 
 $format_error_messages = [
     'category' => 'Выберите категорию',
-    'lot_rate' => 'В это поле нужно ввести число больше нуля',
-    'lot_step' => 'В это поле нужно ввести число больше нуля',
-    'lot_date' => 'Дату нужно ввести, начиная с завтрашней, в формате ГГГГ-ММ-ДД'
+    'lot_rate' => 'В это поле нужно ввести число от 1 до 4294967295',
+    'lot_step' => 'В это поле нужно ввести целое число от 1 до 4294967295',
+    'lot_date' => 'Дату нужно ввести, начиная с завтрашней, в формате ГГГГ-ММ-ДД',
+    'lot_name' => 'В это поле можно ввести не более 255 символов',
+    'message' => 'В это поле можно ввести не более 2000 символов'
 ];
 
 $form_item_error_class = [
@@ -56,32 +58,50 @@ $errors = [
 ];
 $num_errors = 0;
 /*проверка на отправленность формы*/
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_lot = $_POST;
     /*ПРоверяем наличие и заполненность обязательных полей в массиве $_POST.
     Если поле не заполнено, добавляем имя этого поля в массив с ошибками*/
     $error_class = " form__item--invalid";
     foreach ($lot_fields as $key => $error_note) {
-        /*Проверяем обязательные поля*/
-        if (isset($required_error_messages[$key]) && empty($_POST[$key])) {
+        /*Проверяем заполненность обязательных полей, исключая пробелы*/
+        if (isset($required_error_messages[$key]) && empty(trim($_POST[$key]))) {
             $errors[$key] = $error_note;
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
             /*Проверяем соответствие формата и значений полей в массиве $_POST техническому заданию.
-    Если поле заполнено не правильно, добавляем имя этого поля в массив с ошибками*/
-        } elseif ($key === "lot_rate" && (gettype((int)$_POST[$key]) !== "integer" || (int)$_POST[$key] <= 0)) {
+    Если поле заполнено неправильно, добавляем имя этого поля в массив с ошибками*/
+            /*Проверить на предельное значение (с предварительным переводом во float, округлением, переводом в int),
+            на возможность преобразования из строки во float без потери значения.*/
+        } elseif ($key === "lot_rate" && (((int)ceil((float)str_replace(',', '.',
+                        $_POST[$key])) <= 0) || (int)ceil((float)str_replace(',', '.', $_POST[$key])) > 2147483647)) {
             $errors[$key] = $format_error_messages[$key];
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
-        } elseif ($key === "lot_step" && (gettype((int)$_POST[$key]) !== "integer" || (int)$_POST[$key] <= 0)) {
+            /*Проверить на предельное значение, на наличие посторонних для int символов,
+            на возможность преобразования из строки в int без потери значения.*/
+        } elseif ($key === "lot_step" && ((int)$_POST[$key] <= 0 || (int)($_POST[$key]) > 2147483647 || preg_replace('/[0-9]/',
+                    '', trim($_POST[$key])) !== '')) {
             $errors[$key] = $format_error_messages[$key];
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
+            /*Проверить на формат даты и, чтобы дата была не раньше завтрашнего дня*/
         } elseif ($key === "lot_date" && (is_date_valid((string)$_POST[$key]) === false || is_date_after_today((string)$_POST[$key]) === false)) {
             $errors[$key] = $format_error_messages[$key];
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
-        } elseif ($key === "category" && $_POST[$key] === "Выберите категорию") {
+            /*Проверить на наличие категории*/
+        } elseif ($key === "category" && get_category_name($link, (int)$_POST[$key]) === null) {
+            $errors[$key] = $format_error_messages[$key];
+            $form_item_error_class[$key] = $error_class;
+            $num_errors += 1;
+            /*Проверить на предельное значение VARCHAR(255)*/
+        } elseif ($key === "lot_name" && mb_strlen($_POST[$key]) > 255) {
+            $errors[$key] = $format_error_messages[$key];
+            $form_item_error_class[$key] = $error_class;
+            $num_errors += 1;
+            /*Проверить на предельное значение VARCHAR(2000)*/
+        } elseif ($key === "message" && mb_strlen($_POST[$key]) > 2000) {
             $errors[$key] = $format_error_messages[$key];
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
@@ -99,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $form_item_error_class['lot_image'] = $error_class;
             $num_errors += 1;
         }
-        /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
+        /*в случае правильного формата и отсутствия ошибок в форме переименовываем и перемещаем файл в папку uploads*/
         if ($file_type === "image/jpeg" && $num_errors === 0) {
             $path = uniqid() . ".jpg";
             move_uploaded_file($tmp_name, 'uploads/' . $path);
@@ -142,6 +162,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         print($layout_content);
     } else {
         $user_id = $_SESSION['user'];
+        /* Корректируем данные, полученные из формы перед вставкой в БД, приводим их к правильным типам*/
+        $new_lot['lot_rate'] = (int)ceil((float)str_replace(',', '.', $new_lot['lot_rate']));
+        $new_lot['lot_rate'] = (int)$new_lot['lot_rate'];
         $new_id = get_new_lot_id($link, $new_lot, $user_id);
         $path_lot_page = "Location: /lot.php?id=" . (string)$new_id;
         header($path_lot_page);

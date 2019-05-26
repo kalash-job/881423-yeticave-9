@@ -24,7 +24,7 @@ $login_form = [];
 $login_field_error_class = ' form__item--invalid';
 $login_form_error_class = ' form--invalid';
 $login_error_number = 0;
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_form = $_POST;
 
     $required = ['email', 'password'];

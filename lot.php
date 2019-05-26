@@ -10,7 +10,7 @@ if (isset($_GET['id'])) {
 }
 $current_lot = get_current_lot($link, $lot_id);
 $current_lot = $current_lot[0] ?? null;
-if ($current_lot == null) {
+if ($current_lot === null) {
     header("Location: /404.php");
 }
 /*Проверка условий показа блока добавления ставок*/
@@ -23,7 +23,7 @@ if (($user_session['is_auth'] === 1) && (check_last_bid_user($link, $_SESSION['u
 $new_bid_adding['error_note'] = '';
 $new_bid_adding['form_error_class'] = '';
 /*проверка на отправленность формы*/
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_bid = $_POST;
     $new_bid['cost'] = (int)$new_bid['cost'];
     /*Проверка залогиненности пользователя*/

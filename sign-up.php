@@ -44,7 +44,7 @@ $sign_up_errors = [
 $sign_up_num_errors = 0;
 
 /*проверка на отправленность формы*/
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_user = $_POST;
     /*Проверяем наличие и заполненность обязательных полей в массиве $_POST.
     Если поле не заполнено, добавляем имя этого поля в массив с ошибками*/
@@ -79,15 +79,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $sign_up_form_error_class['avatar'] = $sign_up_error_class;
             $sign_up_num_errors += 1;
         }
-        /*в случае правильного формата переименовываем и перемещаем файл в папку uploads*/
+        /*в случае правильного формата  и отсутствия ошибок в форме переименовываем и перемещаем файл в папку uploads*/
         if ($file_type === "image/jpeg" && $sign_up_num_errors === 0) {
             $path = uniqid() . ".jpg";
+            move_uploaded_file($tmp_name, 'uploads/' . $path);
+            $new_user['path'] = $path;
         } elseif ($sign_up_num_errors === 0) {
             $path = uniqid() . ".png";
+            move_uploaded_file($tmp_name, 'uploads/' . $path);
+            $new_user['path'] = $path;
         }
-        move_uploaded_file($tmp_name, 'uploads/' . $path);
-        $new_user['path'] = $path;
-
     }
     if ($sign_up_num_errors !== 0) {
         /*Подключаем шаблон страницы регистрации пользователя с формой,

@@ -42,7 +42,7 @@
             </nav>
         </div>
     </header>
-    <main>
+    <main<?php if ($title === "Главная"): ?> class="container"<?php endif; ?>>
         <?= $top_menu; ?>
         <?= $content; ?>
         <?= $pagination; ?>

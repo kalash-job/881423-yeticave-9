@@ -44,10 +44,10 @@ CREATE FULLTEXT INDEX idx_search_name_descr ON lot (name, description);
 CREATE TABLE bid
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,
-    date       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    bid_amount INT       NOT NULL,
-    user_id    INT       NOT NULL,
-    lot_id     INT       NOT NULL,
+    date       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    bid_amount INT UNSIGNED NOT NULL,
+    user_id    INT          NOT NULL,
+    lot_id     INT          NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user (id),
     FOREIGN KEY (lot_id) REFERENCES lot (id)
 );
