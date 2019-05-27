@@ -20,6 +20,9 @@ $sign_up_lot_fields = [
 
 $sign_up_format_error_messages = [
     'email' => 'Данный email уже зарегистрирован на сайте, введите другой email',
+    'password' => 'Введите пароль без пробелов',
+    'name' => 'В это поле можно ввести не более 255 символов',
+    'message' => 'В это поле можно ввести не более 500 символов',
     'avatar' => 'Загрузите изображение аватара в правильном формате (png или jpeg)'
 ];
 
@@ -51,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sign_up_error_class = " form__item--invalid";
     foreach ($sign_up_lot_fields as $key => $error_note) {
         /*Проверяем обязательные поля*/
-        if (isset($sign_up_required_error_messages[$key]) && empty($_POST[$key])) {
+        if (isset($sign_up_required_error_messages[$key]) && empty(trim($_POST[$key]))) {
             $sign_up_errors[$key] = $error_note;
             $sign_up_form_error_class[$key] = $sign_up_error_class;
             $sign_up_num_errors += 1;
@@ -62,6 +65,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sign_up_form_error_class[$key] = $sign_up_error_class;
             $sign_up_num_errors += 1;
         } elseif ($key === "email" && (check_unique_email($link, $_POST[$key]) === false)) {
+            $sign_up_errors[$key] = $sign_up_format_error_messages[$key];
+            $sign_up_form_error_class[$key] = $sign_up_error_class;
+            $sign_up_num_errors += 1;
+            /*Проверяем пароль на наличие пробелов*/
+        } elseif ($key === "password" && ($_POST[$key] !== str_replace(' ', '', $_POST[$key]))) {
+            $sign_up_errors[$key] = $sign_up_format_error_messages[$key];
+            $sign_up_form_error_class[$key] = $sign_up_error_class;
+            $sign_up_num_errors += 1;
+            /*Проверить на предельное значение VARCHAR(255)*/
+        } elseif ($key === "name" && mb_strlen($_POST[$key]) > 255) {
+            $sign_up_errors[$key] = $sign_up_format_error_messages[$key];
+            $sign_up_form_error_class[$key] = $sign_up_error_class;
+            $sign_up_num_errors += 1;
+            /*Проверить на предельное значение VARCHAR(500)*/
+        } elseif ($key === "message" && mb_strlen($_POST[$key]) > 500) {
             $sign_up_errors[$key] = $sign_up_format_error_messages[$key];
             $sign_up_form_error_class[$key] = $sign_up_error_class;
             $sign_up_num_errors += 1;

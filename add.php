@@ -164,7 +164,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user_id = $_SESSION['user'];
         /* Корректируем данные, полученные из формы перед вставкой в БД, приводим их к правильным типам*/
         $new_lot['lot_rate'] = (int)ceil((float)str_replace(',', '.', $new_lot['lot_rate']));
-        $new_lot['lot_rate'] = (int)$new_lot['lot_rate'];
+        $new_lot['lot_step'] = (int)$new_lot['lot_step'];
+        $new_lot['lot_name'] = trim($new_lot['lot_name']);
+        $new_lot['message'] = trim($new_lot['message']);
         $new_id = get_new_lot_id($link, $new_lot, $user_id);
         $path_lot_page = "Location: /lot.php?id=" . (string)$new_id;
         header($path_lot_page);

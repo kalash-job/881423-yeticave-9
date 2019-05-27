@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($login_error_number === 0) {
         /*Проверка правильности введенного пароля*/
-        if (!password_verify($login_form['password'], $user['password'])) {
+        if (!password_verify(trim($login_form['password']), $user['password'])) {
             $login_errors['password'] = 'Вы ввели неверный пароль';
             $form_login_error_class['password'] = $login_field_error_class;
             $form_login_error_class['login_form'] = $login_form_error_class;
