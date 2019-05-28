@@ -111,9 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['lot_image']['name']) && $_FILES['lot_image']['name'] !== "" && $_FILES['lot_image']['tmp_name'] !== "") {
         $tmp_name = $_FILES['lot_image']['tmp_name'];
         $path = $_FILES['lot_image']['name'];
+        $file_type = mime_content_type($tmp_name);
         /*Проверяем файл картинки лота*/
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $file_type = finfo_file($finfo, $tmp_name);
         if ($file_type !== "image/jpeg" && $file_type !== "image/png") {
             $errors['lot_image'] = 'Загрузите изображение лота в правильном формате (png или jpeg)';
             $form_item_error_class['lot_image'] = $error_class;

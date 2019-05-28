@@ -89,9 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['avatar']['name']) && $_FILES['avatar']['name'] !== "" && $_FILES['avatar']['tmp_name'] !== "") {
         $tmp_name = $_FILES['avatar']['tmp_name'];
         $path = $_FILES['avatar']['name'];
+        $file_type = mime_content_type($tmp_name);
         /*Проверяем файл картинки аватара*/
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $file_type = finfo_file($finfo, $tmp_name);
         if ($file_type !== "image/jpeg" && $file_type !== "image/png") {
             $sign_up_errors['avatar'] = $sign_up_format_error_messages['avatar'];
             $sign_up_form_error_class['avatar'] = $sign_up_error_class;
