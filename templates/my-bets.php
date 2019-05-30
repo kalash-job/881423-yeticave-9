@@ -42,7 +42,7 @@
                     <div class="timer<?= $class_timer; ?>"><?= $note_timer; ?></div>
                 </td>
                 <td class="rates__price">
-                    <?= format_cost_for_bids(htmlspecialchars($users_bids_option["bid_amount"])); ?>
+                    <?= format_cost_for_bids($users_bids_option["bid_amount"]); ?>
                 </td>
                 <td class="rates__time">
                     <?= $time_of_bid; ?>
