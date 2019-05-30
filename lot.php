@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once 'init.php';
-/*Попробовать сначала обработать данные ПОСТ-запроса, а затем редирект на ту же страницу, чтобы не потерять данные ГЕТ-запроса*/
+
 $categories = get_categories($link);
 if (isset($_GET['id'])) {
     $lot_id = (int)$_GET['id'];
@@ -29,6 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /*Проверка залогиненности пользователя*/
     if (($user_session['is_auth'] === 0)) {
         header("Location: /login.php");
+        exit();
+    }
+    /*Проверка на принадлежность лота пользователю и последнюю ставку пользователя по лоту*/
+    //var_dump(!check_last_bid_user($link, $_SESSION['user'], (int)$_GET['id']));
+    if ((!check_last_bid_user($link, $_SESSION['user'], (int)$_GET['id'])) || $_SESSION['user'] === $current_lot['user_id']) {
+        header("Location: /lot.php?id=" . $_GET['id']);
+        exit();
+    }
+    /*Проверка не закрыт ли лот*/
+    if ($current_lot['timestamp_to_clos_date'] <= 0) {
+        header("Location: /index.php");
     }
     /*Проверяем обязательное поле*/
     if (empty($new_bid['cost'])) {

@@ -334,9 +334,9 @@ FROM bid b
 WHERE b.lot_id = ?
 ORDER BY b.bid_amount DESC LIMIT 1';
     $stmt = db_get_prepare_stmt($link, $sql, [$lot_id]);
-    $max_bit_user = select($stmt, $link);
-    $max_bit_user = $max_bit_user[0] ?? null;
-    if ((int)$max_bit_user['user_id'] === $user_id) {
+    $max_bid_user = select($stmt, $link);
+    $max_bid_user = $max_bid_user[0] ?? null;
+    if ((int)$max_bid_user['user_id'] === $user_id) {
         return false;
     }
     return true;

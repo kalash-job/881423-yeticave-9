@@ -2,6 +2,10 @@
 declare(strict_types=1);
 require_once 'init.php';
 
+if (isset($_SESSION['user'])) {
+    header("Location: /index.php");
+    exit();
+}
 $categories = get_categories($link);
 $form_login_error_class = [
     'email' => '',
