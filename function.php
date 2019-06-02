@@ -4,13 +4,12 @@ declare(strict_types=1);
 /** Функция форматирует стоимость лота
  * Добавляет пробел для отделения трех последних цифр, если число больше/равно 1000
  * Добавляет значок рубля в конце стоимости лота.
- * @param float $cost
+ * @param int $cost
  * @return string
  */
-function format_cost(float $cost): string
+function format_cost(int $cost): string
 {
     $result = "";
-    $cost = ceil($cost);
     if ($cost >= 1000) {
         $result = number_format($cost, 0, "", " ");
     } else {
@@ -22,13 +21,12 @@ function format_cost(float $cost): string
 /** Функция форматирует стоимость лота для таблицы ставок пользователя
  * Добавляет пробел для отделения трех последних цифр, если число больше/равно 1000
  * Добавляет сокращение р в конце стоимости лота.
- * @param float $cost
+ * @param int $cost
  * @return string
  */
-function format_cost_for_bids(float $cost): string
+function format_cost_for_bids(int $cost): string
 {
     $result = "";
-    $cost = ceil($cost);
     if ($cost >= 1000) {
         $result = number_format($cost, 0, "", " ");
     } else {
@@ -39,13 +37,12 @@ function format_cost_for_bids(float $cost): string
 
 /** Функция форматирует стоимость лота для блока ставок на странице лота
  * Добавляет пробел для отделения трех последних цифр, если число больше/равно 1000
- * @param float $cost
+ * @param int $cost
  * @return string
  */
-function format_cost_for_bids_block(float $cost): string
+function format_cost_for_bids_block(int $cost): string
 {
     $result = "";
-    $cost = ceil($cost);
     if ($cost >= 1000) {
         $result = number_format($cost, 0, "", " ");
     } else {

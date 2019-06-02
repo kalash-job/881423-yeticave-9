@@ -6,12 +6,40 @@ $categories = get_categories($link);
 if (isset($_GET['id'])) {
     $lot_id = (int)$_GET['id'];
 } else {
-    header("Location: /404.php");
+    http_response_code(404);
+    /*Сборка шаблона страницы ошибки 404*/
+    $top_menu = include_template('top-menu.php',
+        ['categories' => $categories]);
+    $page_content = include_template('404.php', ['categories' => $categories, 'user_session' => $user_session]);
+    $layout_content = include_template('layout.php', [
+        'top_menu' => $top_menu,
+        'content' => $page_content,
+        'categories' => $categories,
+        'user_session' => $user_session,
+        'pagination' => '',
+        'title' => '404 Страница не найдена'
+    ]);
+    print($layout_content);
+    exit();
 }
 $current_lot = get_current_lot($link, $lot_id);
 $current_lot = $current_lot[0] ?? null;
 if ($current_lot === null) {
-    header("Location: /404.php");
+    http_response_code(404);
+    /*Сборка шаблона страницы ошибки 404*/
+    $top_menu = include_template('top-menu.php',
+        ['categories' => $categories]);
+    $page_content = include_template('404.php', ['categories' => $categories, 'user_session' => $user_session]);
+    $layout_content = include_template('layout.php', [
+        'top_menu' => $top_menu,
+        'content' => $page_content,
+        'categories' => $categories,
+        'user_session' => $user_session,
+        'pagination' => '',
+        'title' => '404 Страница не найдена'
+    ]);
+    print($layout_content);
+    exit();
 }
 /*Проверка условий показа блока добавления ставок*/
 if (($user_session['is_auth'] === 1) && (check_last_bid_user($link, $_SESSION['user'],
@@ -25,7 +53,9 @@ $new_bid_adding['form_error_class'] = '';
 /*проверка на отправленность формы*/
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_bid = $_POST;
-    $new_bid['cost'] = (int)$new_bid['cost'];
+    if (isset($new_bid['cost'])) {
+        $new_bid['cost'] = (int)$new_bid['cost'];
+    }
     /*Проверка залогиненности пользователя*/
     if (($user_session['is_auth'] === 0)) {
         header("Location: /login.php");
@@ -33,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     /*Проверка на принадлежность лота пользователю и последнюю ставку пользователя по лоту*/
     //var_dump(!check_last_bid_user($link, $_SESSION['user'], (int)$_GET['id']));
-    if ((!check_last_bid_user($link, $_SESSION['user'], (int)$_GET['id'])) || $_SESSION['user'] === $current_lot['user_id']) {
+    if ((!check_last_bid_user($link, $_SESSION['user'],
+            (int)$_GET['id'])) || $_SESSION['user'] === $current_lot['user_id']) {
         header("Location: /lot.php?id=" . $_GET['id']);
         exit();
     }
@@ -45,7 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($new_bid['cost'])) {
         $new_bid_adding['error_note'] = 'Введите размер ставки';
         $new_bid_adding['form_error_class'] = ' form__item--invalid';
-        /*Проверка типа значения и размера введенной ставки*/
+        /*Проверка типа значения и размера введенной ставки, включая проверку на предельное значение типа*/
+    } elseif (is_int($new_bid['cost']) && $new_bid['cost'] > 4294967295) {
+        $new_bid_adding['error_note'] = 'Введите целое число, размером не более 4294967295';
+        $new_bid_adding['form_error_class'] = ' form__item--invalid';
     } elseif (is_int($new_bid['cost']) && $new_bid['cost'] >= $current_lot['min_bid']) {
         /*Добавляем ставку в таблицу ставок с привязкой к лоту и пользователю*/
         $new_bid['user_id'] = $_SESSION['user'];
