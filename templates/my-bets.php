@@ -5,7 +5,7 @@
             <!--подготовка классов и подписей для форматирования столбца Время до окончания лота-->
             <?php if (isset($users_bids_option['winner_id']) && $users_bids_option['winner_id'] === $users_bids_option['user_id']) {
                 $value = ' rates__item--win';
-                $contacts = '<p>' . $users_bids_option['contact'] . '</p>';
+                $contacts = '<p>' . htmlspecialchars($users_bids_option['contact']) . '</p>';
                 $class_timer = ' timer--win';
                 $note_timer = 'Ставка выиграла';
             } elseif (isset($users_bids_option['timestamp_to_clos_date']) && (int)$users_bids_option["timestamp_to_clos_date"] < 0) {
@@ -32,7 +32,7 @@
                         <h3 class="rates__title"><a
                                     href="lot.php?id=<?= $users_bids_option['lot_id']; ?>"><?= htmlspecialchars($users_bids_option['name']); ?></a>
                         </h3>
-                        <?= htmlspecialchars($contacts); ?>
+                        <?= $contacts; ?>
                     </div>
                 </td>
                 <td class="rates__category">

@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /*Проверка не закрыт ли лот*/
     if ($current_lot['timestamp_to_clos_date'] <= 0) {
         header("Location: /index.php");
+        exit();
     }
     /*Проверяем обязательное поле*/
     if (empty($new_bid['cost'])) {
@@ -86,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_bid['lot_id'] = (int)$_GET['id'];
         add_new_bid($link, $new_bid);
         header("Location: /lot.php?id=" . $new_bid['lot_id']);
+        exit();
     } else {
         $new_bid_adding['error_note'] = 'Введите целое число, размером не меньше минимальной ставки';
         $new_bid_adding['form_error_class'] = ' form__item--invalid';

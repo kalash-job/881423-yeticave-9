@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sign_up_error_class = " form__item--invalid";
     foreach ($sign_up_lot_fields as $key => $error_note) {
         /*Проверяем обязательные поля*/
-        if (isset($sign_up_required_error_messages[$key]) && empty(trim($_POST[$key]))) {
+        if (isset($sign_up_required_error_messages[$key]) && (isset($_POST[$key]) && empty(trim($_POST[$key])) || empty($_POST[$key]))) {
             $sign_up_errors[$key] = $error_note;
             $sign_up_form_error_class[$key] = $sign_up_error_class;
             $sign_up_num_errors += 1;

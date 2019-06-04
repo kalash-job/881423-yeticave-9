@@ -41,8 +41,8 @@ $lot_fields = [
 
 $format_error_messages = [
     'category' => 'Выберите категорию',
-    'lot_rate' => 'В это поле нужно ввести число от 1 до 4294967295',
-    'lot_step' => 'В это поле нужно ввести целое число от 1 до 4294967295',
+    'lot_rate' => 'В это поле нужно ввести число от 1 до 2147483647',
+    'lot_step' => 'В это поле нужно ввести целое число от 1 до 2147483647',
     'lot_date' => 'Дату нужно ввести, начиная с завтрашней, в формате ГГГГ-ММ-ДД',
     'lot_name' => 'В это поле можно ввести не более 255 символов',
     'message' => 'В это поле можно ввести не более 2000 символов'
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error_class = " form__item--invalid";
     foreach ($lot_fields as $key => $error_note) {
         /*Проверяем заполненность обязательных полей, исключая пробелы*/
-        if (isset($required_error_messages[$key]) && empty(trim($_POST[$key]))) {
+        if (isset($required_error_messages[$key]) && (isset($_POST[$key]) && empty(trim($_POST[$key])) || empty($_POST[$key]))) {
             $errors[$key] = $error_note;
             $form_item_error_class[$key] = $error_class;
             $num_errors += 1;
@@ -86,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Если поле заполнено неправильно, добавляем имя этого поля в массив с ошибками*/
             /*Проверить на предельное значение (с предварительным переводом во float, округлением, переводом в int),
             на возможность преобразования из строки во float без потери значения.*/
+
         } elseif ($key === "lot_rate" && (((int)ceil((float)str_replace(',', '.',
                         $_POST[$key])) <= 0) || (int)ceil((float)str_replace(',', '.', $_POST[$key])) > 2147483647)) {
             $errors[$key] = $format_error_messages[$key];
@@ -182,6 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_id = get_new_lot_id($link, $new_lot, $user_id);
         $path_lot_page = "Location: /lot.php?id=" . (string)$new_id;
         header($path_lot_page);
+        exit();
     }
 } else {
     /*Сборка шаблона страницы добавления лота*/

@@ -49,6 +49,7 @@ $page_items = 9; //Количество лотов на одной страни�
 $current_page = $_GET['page'] ?? 1;
 $current_page = (int)$current_page;
 $pages_count = (int)ceil($items_num / $page_items); //количество страниц для показа всех лотов категории
+/*Корректировка для некорректных подстановок значений page*/
 if ($current_page > $pages_count) {
     $current_page = $pages_count;
 } elseif ($current_page === 0) {

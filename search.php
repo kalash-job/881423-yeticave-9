@@ -7,10 +7,17 @@ $search = $_GET['search'] ?? '';
 if (trim($search) !== '') {
     $current_page = $_GET['page'] ?? 1;
     $current_page = (int)$current_page;
+
     $page_items = 9; //Количество лотов на одной странице
     $search_result_num = get_search_num($link, trim($search)); //к-во лотов, которые показываем в результатах поиска
     $search_result_num = $search_result_num[0]['result_num'] ?? null;
     $pages_count = (int)ceil($search_result_num / $page_items); //количество страниц для показа всех рез-в поиска
+    /*Корректировка для некорректных подстановок значений page*/
+    if ($current_page > $pages_count) {
+        $current_page = $pages_count;
+    } elseif ($current_page === 0) {
+        $current_page = 1;
+    }
     $offset = ($current_page - 1) * $page_items;
     $pages = range(1, $pages_count);
     $items = get_search_result($link, trim($search), $page_items, $offset);
